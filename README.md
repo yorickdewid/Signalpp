@@ -1,2 +1,2 @@
-# Signal-
+# Signal++
 Signal desktop client
