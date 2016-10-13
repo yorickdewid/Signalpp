@@ -4,7 +4,7 @@ LIBS=-lleveldb
 CXXFLAGS=-g -O0 -Wall -std=c++11
 
 all:
-	$(CXX) $(CXXFLAGS) $(INCLUDE) $(LIBS) signalclient.cpp -o $(BIN)
+	$(CXX) $(CXXFLAGS) $(INCLUDE) $(LIBS) signalclient.cpp ../src/libtsec.a -o $(BIN)
 
 clean:
 	$(RM) -rf $(BIN)

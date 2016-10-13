@@ -2,6 +2,7 @@
 #define _API_H_
 
 #include <vector>
+#include <string>
 
 namespace signal {
 
