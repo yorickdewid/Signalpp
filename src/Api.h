@@ -55,7 +55,7 @@ class TextSecureServer {
 	}
 
 	void getUrl() {}
-	void performCall() {}
+	void performCall() {} /* cURL */
 	void requestVerificationSMS(const std::string& number) {}
 	void requestVerificationVoice(const std::string& number) {}
 	void confirmCode() {}

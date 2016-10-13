@@ -13,7 +13,7 @@ void registerClient() {
 	signal::AccountManager accountManager(signal::serverUrl, signal::serverPorts, username, password);
 
 	auto provisionUrl = [](const std::string& url) {
-		std::cout << url << std::endl;
+		SIGNAL_LOG_INFO << "Provision URL: " << url;
 	};
 
 	accountManager.registerSecondDevice(
@@ -27,7 +27,9 @@ void registerClient() {
 }
 
 int main(int argc, char *argv[]) {
-	std::cout << "Running " << signal::getVersion() << std::endl;
+	signal::Logger::setLogLevel(signal::LogLevel::DEBUG);
+
+	SIGNAL_LOG_INFO << "Library version " << signal::getVersion();
 
 	if (!signal::Registration::everDone(storage)) {
 		registerClient();
