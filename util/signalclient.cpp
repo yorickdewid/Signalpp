@@ -6,7 +6,7 @@
 
 int main(int argc, char *argv[]) {
 
-	printf("%s\n", "Someshit");
+	printf("%s\n", "Default output");
 
 	return 0;
 }

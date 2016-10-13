@@ -4,8 +4,8 @@
 namespace sinl {
 
 /* Version */
-static const int kMajorVersion = 0;
-static const int kMinorVersion = 1;
+static const int majorVersion = 0;
+static const int minorVersion = 1;
 
 }; // namespace sinl
 
