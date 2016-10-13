@@ -24,7 +24,6 @@ class Database : public StorageContainer {
 	leveldb::Options m_options;
 
   public:
-
 	Database(const std::string& name) {
 	    m_options.create_if_missing = true;
 		
