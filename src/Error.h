@@ -1,7 +1,7 @@
 #ifndef _ERROR_H_
 #define _ERROR_H_
 
-namespace sinl {
+namespace signal {
 
 class Error {
 public:
@@ -24,6 +24,6 @@ public:
 
 };
 
-} // namespace sinl
+} // namespace signal
 
 #endif // _ERROR_H_

@@ -5,7 +5,9 @@
 
 #include <leveldb/db.h>
 
-namespace sinl {
+#define DEFAULT_NAME "indexdb"
+
+namespace signal {
 
 class StorageContainer {
   public:
@@ -19,12 +21,12 @@ class StorageContainer {
 
 };
 
-class Database : public StorageContainer {
+class Ldb : public StorageContainer {
 	leveldb::DB* m_db;
 	leveldb::Options m_options;
 
   public:
-	Database(const std::string& name) {
+	Ldb(const std::string& name) {
 	    m_options.create_if_missing = true;
 		
 		leveldb::Status status = leveldb::DB::Open(m_options, name, &m_db);
@@ -35,7 +37,7 @@ class Database : public StorageContainer {
 		}
 	}
 
-	~Database() {
+	~Ldb() {
 		close();
 	}
 
@@ -64,7 +66,7 @@ class Storage : public StorageContainer {
 	std::unique_ptr<StorageContainer> m_db;
 
   public:
-	Storage(const std::string& name) : m_db(new T(name)) {
+	Storage(const std::string& name = DEFAULT_NAME) : m_db(new T(name)) {
 	}
 
 	inline void put(const std::string& key, const std::string& value) {
@@ -73,6 +75,12 @@ class Storage : public StorageContainer {
 
 	inline void get(const std::string& key, std::string& value) {
 		m_db->get(key, value);
+	}
+
+	inline std::string get(const std::string& key) {
+		std::string value;
+		m_db->get(key, value);
+		return value;
 	}
 
 	inline void purge(const std::string& key) {
@@ -85,9 +93,9 @@ class Storage : public StorageContainer {
 
 	inline void flush() {
 		m_db->flush();
-	}	
+	}
 };
 
-} // namespace sinl
+} // namespace signal
 
 #endif // _STORAGE_H_

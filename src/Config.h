@@ -1,7 +1,7 @@
 #ifndef _CONFIG_H_
 #define _CONFIG_H_
 
-namespace sinl {
+namespace signal {
 
 /* Version */
 constexpr int majorVersion = 0;
@@ -14,6 +14,6 @@ static const char websocketUrl[] = "wss://textsecure-service-ca.whispersystems.o
 static const char AttachmentServerUrl[] = "https://whispersystems-textsecure-attachments.s3.amazonaws.com";
 static const unsigned short serverPorts[] = {80, 4433, 8443, 0};
 
-}; // namespace sinl
+}; // namespace signal
 
 #endif // _CONFIG_H_

@@ -1,7 +1,7 @@
 #ifndef _WEBSOCKET_RESOURCE_H_
 #define _WEBSOCKET_RESOURCE_H_
 
-namespace sinl {
+namespace signal {
 
 struct IncomingWebSocketRequest {
 	IncomingWebSocketRequest(std::string verb,
@@ -77,6 +77,6 @@ class WebSocketResource {
   	void close() {}
 };
 
-} // namespace sinl
+} // namespace signal
 
 #endif // _WEBSOCKET_RESOURCE_H_

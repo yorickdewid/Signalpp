@@ -4,7 +4,9 @@
 #include "Api.h"
 #include "WebsocketResource.h"
 
-namespace sinl {
+#include <functional>
+
+namespace signal {
 
 class AccountManager {
 	std::unique_ptr<TextSecureServer> m_server;
@@ -26,10 +28,13 @@ public:
 	}
 
 	void registerSingleDevice() {}
-	void registerSecondDevice() {
+	void registerSecondDevice(std::function<void (const std::string&)> setProvisioningUrl, std::function<void()> confirmNumber) {
 		/*var socket =*/ m_server->getProvisioningSocket();
-
+		
 		// call crypto.getPublicKey()
+
+		setProvisioningUrl("tsdevice:/?uuid=<UUID>&pub_key=<PUBKEY>");
+
 		// call WebSocketResource(socket, lambda)
 
 		generateKeys();
@@ -42,6 +47,6 @@ public:
 	void registrationDone() {}
 };
 
-} // namespace sinl
+} // namespace signal
 
 #endif // _ACCOUNT_MANAGER_H_

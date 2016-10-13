@@ -3,7 +3,7 @@
 
 #include <vector>
 
-namespace sinl {
+namespace signal {
 
 class PortManager {
 	unsigned int index = 0;
@@ -69,6 +69,6 @@ class TextSecureServer {
 	void getProvisioningSocket() {}
 };
 
-} // namespace sinl
+} // namespace signal
 
 #endif // _API_H_

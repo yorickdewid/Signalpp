@@ -1,11 +1,11 @@
 #ifndef _CRYPTO_H_
 #define _CRYPTO_H_
 
-namespace sinl {
+namespace signal {
 
 class Crypto {
 };
 
-} // namespace sinl
+} // namespace signal
 
 #endif // _CRYPTO_H_

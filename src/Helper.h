@@ -1,11 +1,11 @@
 #ifndef _HELPER_H_
 #define _HELPER_H_
 
-namespace sinl {
+namespace signal {
 
 namespace {
 
-// osName()
+// getDeviceName()
 
 static const char *getVersion() {
 	static char buf[8];
@@ -15,7 +15,7 @@ static const char *getVersion() {
 
 } // namespace
 
-} // namespace sinl
+} // namespace signal
 
 #endif // _HELPER_H_
 
