@@ -6,6 +6,7 @@ namespace sinl {
 /* Version */
 static const int majorVersion = 0;
 static const int minorVersion = 1;
+static const int patchVersion = 0;
 
 }; // namespace sinl
 
