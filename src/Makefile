@@ -1,9 +1,10 @@
 RANLIB=ranlib
-LIBSRC=AccountManager.cpp
+LIBSRC=CryptoProvider.cpp AccountManager.cpp ProvisioningCipher.cpp
 LIBOBJ=$(LIBSRC:.cpp=.o)
 
-CXXFLAGS=-Wall -g -O0 -std=c++11
-LOADLIBES=-L./
+CXXFLAGS=-Wall -g -O0 -std=c++11 -I../libsignal-protocol-c/src/ -DENABLE_LOGGING -Wno-unused-function -Wno-unused-variable
+INCLUDE=
+LIBES=
 
 TSECLIB=libtsec.a
 TARGETS=$(TSECLIB)

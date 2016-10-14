@@ -28,12 +28,11 @@ public:
 	    m_server->requestVerificationSMS(number);
 	}
 
-	void registerSingleDevice() {}
-	void registerSecondDevice(std::function<void (const std::string&)> setProvisioningUrl, std::function<void()> confirmNumber);
+	bool registerSingleDevice() { return false; }
+	bool registerSecondDevice(std::function<void (const std::string&)> setProvisioningUrl, std::function<void()> confirmNumber);
 	void refreshPreKeys() {}
 	void createAccount() {}
 	void generateKeys() {}
-	void registrationDone() {}
 };
 
 } // namespace signal

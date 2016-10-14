@@ -1,17 +1,26 @@
 #include "AccountManager.h"
+#include "ProvisioningCipher.h"
+
+#include <sstream>
 
 using namespace signal;
 
-void AccountManager::registerSecondDevice(std::function<void(const std::string&)> setProvisioningUrl, std::function<void()> confirmNumber) {
-	/*var socket =*/ m_server->getProvisioningSocket();
+bool AccountManager::registerSecondDevice(std::function<void(const std::string&)> setProvisioningUrl, std::function<void()> confirmNumber) {
+	ProvisioningCipher crypto;
+	/*var socket = m_server->getProvisioningSocket(); */
 	
-	// call crypto.getPublicKey()
-
-	setProvisioningUrl("tsdevice:/?uuid=<UUID>&pub_key=<PUBKEY>");
-
 	// call WebSocketResource(socket, lambda)
+
+	std::ostringstream os;
+	os << "tsdevice:/?uuid=";
+	os << "<UUID>";
+	os << "&pub_key=";
+	os << crypto.getPublicKey();
+
+	setProvisioningUrl(os.str());
 
 	generateKeys();
 	m_server->registerKeys();
-	registrationDone();
+	
+	return true;
 }

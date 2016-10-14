@@ -16,14 +16,11 @@ void registerClient() {
 		SIGNAL_LOG_INFO << "Provision URL: " << url;
 	};
 
-	accountManager.registerSecondDevice(
-		provisionUrl,
-		[]{}
-	);
+	if (accountManager.registerSecondDevice(provisionUrl, []{})) {
+    	signal::Registration::markDone(storage);
+    }
     
     // textsecure:contactsync
-
-    signal::Registration::markDone(storage);
 }
 
 int main(int argc, char *argv[]) {

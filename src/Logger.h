@@ -35,15 +35,15 @@ enum class LogLevel {
 };
 
 class LogHandlerContainer {
-	public:
-		virtual void log(std::string message, LogLevel level) = 0;
+  public:
+	virtual void log(std::string message, LogLevel level) = 0;
 };
 
 class CoutLogHandler : public LogHandlerContainer {
-	public:
-		void log(std::string message, LogLevel /*level*/) override {
-			std::cout << message;
-		}
+  public:
+	void log(std::string message, LogLevel /*level*/) override {
+		std::cout << message;
+	}
 };
 
 class Logger {
