@@ -20,9 +20,9 @@ void register_client() {
 	};
 
 	/* For the moment just show the URL */
-	auto confirmNumber = [] (const std::string& number) {
+	auto confirmNumber = [] (const std::string& number) -> std::string {
 		SIGNAL_LOG_INFO << "Number: " << number;
-		//TODO: return deviceName
+		return "SignalClient";
 	};
 
 	if (accountManager.registerSecondDevice(provisionUrl, confirmNumber)) {

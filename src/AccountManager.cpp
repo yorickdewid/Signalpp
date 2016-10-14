@@ -8,7 +8,7 @@
 using namespace signal;
 
 bool AccountManager::registerSecondDevice(std::function<void(const std::string&)> setProvisioningUrl,
-											std::function<void(const std::string&)> confirmNumber) {
+											std::function<std::string(const std::string&)> confirmNumber) {
 	ProvisioningCipher provisioningCipher;
 
 	/* Open socket */	
@@ -38,7 +38,8 @@ bool AccountManager::registerSecondDevice(std::function<void(const std::string&)
             request.respond(200, "OK");
             // socket.close();
             // var provisionMessage = provisioningCipher.decrypt(envelope);
-            confirmNumber("+31641074371");
+            std::string deviceName = confirmNumber("+31641074371");
+            SIGNAL_LOG_DEBUG << "Client device name: " << deviceName;
             // var deviceName = confirmNumber(provisionMessage.number);
 			// return createAccount(
 			// 	provisionMessage.number,

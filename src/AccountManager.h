@@ -29,7 +29,7 @@ public:
 
 	bool registerSingleDevice() { return false; }
 	bool registerSecondDevice(std::function<void (const std::string&)> setProvisioningUrl,
-								std::function<void(const std::string&)> confirmNumber);
+								std::function<std::string(const std::string&)> confirmNumber);
 	void refreshPreKeys() {}
 	void createAccount(const std::string& number, int provisioningCode, const std::string& deviceName);
 	void generateKeys() {}
