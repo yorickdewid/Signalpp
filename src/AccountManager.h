@@ -2,7 +2,6 @@
 #define _ACCOUNT_MANAGER_H_
 
 #include "Api.h"
-#include "WebsocketResource.h"
 
 #include <functional>
 #include <memory>
@@ -29,9 +28,10 @@ public:
 	}
 
 	bool registerSingleDevice() { return false; }
-	bool registerSecondDevice(std::function<void (const std::string&)> setProvisioningUrl, std::function<void()> confirmNumber);
+	bool registerSecondDevice(std::function<void (const std::string&)> setProvisioningUrl,
+								std::function<void(const std::string&)> confirmNumber);
 	void refreshPreKeys() {}
-	void createAccount() {}
+	void createAccount(const std::string& number, int provisioningCode, const std::string& deviceName);
 	void generateKeys() {}
 };
 

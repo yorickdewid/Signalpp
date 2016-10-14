@@ -38,7 +38,7 @@ ProvisioningCipher::~ProvisioningCipher() {
 char *ProvisioningCipher::getPublicKey() {
 	int result = curve_generate_key_pair(context, &key_pair);
 	if (result) {
-		SIGNAL_LOG_DEBUG << "curve_generate_key_pair() failed";
+		SIGNAL_LOG_ERROR << "curve_generate_key_pair() failed";
 		return nullptr; //TODO: throw
 	}
 

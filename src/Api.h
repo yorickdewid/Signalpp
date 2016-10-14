@@ -1,8 +1,12 @@
 #ifndef _API_H_
 #define _API_H_
 
+#include "Logger.h"
+#include "Helper.h"
+
 #include <vector>
 #include <string>
+#include <sstream>
 
 namespace signal {
 
@@ -46,15 +50,21 @@ class TextSecureServer {
 	, m_username(username)
 	, m_password(password)
 	, m_attachUrl(attachment_server_url) {
-
 		int i = 0;
 		while (ports[i] > 0) {
-			m_portManager.add(i);
+			m_portManager.add(ports[i]);
 			++i;
 		}
 	}
 
-	void getUrl() {}
+	inline std::string getUrl() {
+		std::ostringstream os;
+		os << m_url;
+		os << ':';
+		os << m_portManager.getPort();
+		return os.str();
+	}
+
 	void performCall() {} /* cURL */
 	void requestVerificationSMS(const std::string& number) {}
 	void requestVerificationVoice(const std::string& number) {}
@@ -67,7 +77,19 @@ class TextSecureServer {
 	void getAttachment() {}
 	void putAttachment() {}
 	void getMessageSocket() {}
-	void getProvisioningSocket() {}
+
+	int getProvisioningSocket() {
+		std::string url = getUrl();
+
+		replace(url, "https://", "wss://");
+		replace(url, "http://", "ws://");
+
+		url += "/v1/websocket/provisioning/?agent=OWD";
+
+		SIGNAL_LOG_DEBUG << "Opening websocket to " << url;
+		// return new WebSocket(url);
+		return 1;
+	}
 };
 
 } // namespace signal

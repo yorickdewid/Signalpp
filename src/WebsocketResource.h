@@ -1,39 +1,38 @@
 #ifndef _WEBSOCKET_RESOURCE_H_
 #define _WEBSOCKET_RESOURCE_H_
 
+#include <functional>
+
 namespace signal {
 
 struct IncomingWebSocketRequest {
-	IncomingWebSocketRequest(std::string verb,
-							std::string path,
-							std::string body,
-							int id
-							//io_service m_socket)
-							)
-	: m_verb(verb)
-	, m_path(path)
-	, m_body(body)
-	, m_id(id)
-	//, m_socket(m_socket) {
-	{
+	std::string verb;
+	std::string path;
+	std::string body;
+	int id;
+	int socket;
+
+	IncomingWebSocketRequest(std::string _verb, std::string _path, std::string _body, int _id, int _socket)
+	: verb(_verb)
+	, path(_path)
+	, body(_body)
+	, id(_id)
+	, socket(_socket) {
 		
 		/* Must have an id */
 		if (id == 0) {
 			// id = random 2 byte
 		}
-
 	}
 
-	void respond() {
-		// send via m_socket
+	void respond(unsigned short status, const std::string& message) {
+		// socket.send(
+		//	new textsecure.protobuf.WebSocketMessage({
+		//		type: textsecure.protobuf.WebSocketMessage.Type.RESPONSE,
+		//		response: { id: id, message: message, status: status }
+		//		}).encode().toArrayBuffer()
+		//	);
 	}
-
-  private:
-	std::string m_verb;
-	std::string m_path;
-	std::string m_body;
-	int m_id;
-	// io_service m_socket;
 };
 
 struct OutgoingWebSocketRequest {
@@ -42,17 +41,24 @@ struct OutgoingWebSocketRequest {
 
 class WebSocketResource {
 
+	int m_socket;
+	std::function<void(IncomingWebSocketRequest request)> handleRequest;
+
 	void onMessage() {
 		// Decode using protobuf to message
 
 		// if (message.type === textsecure.protobuf.WebSocketMessage.Type.REQUEST ) {
-		//     call lambda( new IncomingWebSocketRequest({
-        //                    message.request.verb,
-        //                    message.request.path,
-        //                    message.request.body,
-        //                    message.request.id,
-        //                    socket
-        //                }) )
+		handleRequest(IncomingWebSocketRequest(
+			"PUT",
+			//message.request.verb,
+			"/v1/address",
+			//message.request.path,
+			"",
+			//message.request.body,
+			7384653,
+			//message.request.id,
+			m_socket
+		));
 		// else
 		//     something else
 	}
@@ -62,9 +68,10 @@ class WebSocketResource {
 	}
 
   public:
-  	WebSocketResource(/* var socket, callback lambda */) {
+  	WebSocketResource(int socket, std::function<void(IncomingWebSocketRequest request)> callback) : m_socket(socket), handleRequest(callback) {
   		// Websocket is already active at this point
   		
+  		onMessage();
   		// Register lambda
   		// Register Websocket hanlers
   		// Register timer

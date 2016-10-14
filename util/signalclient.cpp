@@ -12,15 +12,19 @@ void registerClient() {
 
 	signal::AccountManager accountManager(signal::serverUrl, signal::serverPorts, username, password);
 
-	auto provisionUrl = [](const std::string& url) {
+	auto provisionUrl = [] (const std::string& url) {
 		SIGNAL_LOG_INFO << "Provision URL: " << url;
 	};
 
-	if (accountManager.registerSecondDevice(provisionUrl, []{})) {
-    	signal::Registration::markDone(storage);
-    }
-    
-    // textsecure:contactsync
+	auto confirmNumber = [] (const std::string& number) {
+		SIGNAL_LOG_INFO << "Number: " << number;
+	};
+
+	if (accountManager.registerSecondDevice(provisionUrl, confirmNumber)) {
+		signal::Registration::markDone(storage);
+	}
+
+	// textsecure:contactsync
 }
 
 int main(int argc, char *argv[]) {
