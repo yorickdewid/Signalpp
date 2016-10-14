@@ -2,22 +2,27 @@
 #include <sstream>
 #include <string>
 
+#include <getopt.h>
+
 #include <signal/signal.h>
 
 signal::Storage<signal::Ldb> storage;
 
-void registerClient() {
+void register_client() {
 	std::string username = storage.get("username");
 	std::string password = storage.get("password");
 
 	signal::AccountManager accountManager(signal::serverUrl, signal::serverPorts, username, password);
 
+	/* For the moment just show the URL */
 	auto provisionUrl = [] (const std::string& url) {
 		SIGNAL_LOG_INFO << "Provision URL: " << url;
 	};
 
+	/* For the moment just show the URL */
 	auto confirmNumber = [] (const std::string& number) {
 		SIGNAL_LOG_INFO << "Number: " << number;
+		//TODO: return deviceName
 	};
 
 	if (accountManager.registerSecondDevice(provisionUrl, confirmNumber)) {
@@ -27,13 +32,65 @@ void registerClient() {
 	// textsecure:contactsync
 }
 
-int main(int argc, char *argv[]) {
-	signal::Logger::setLogLevel(signal::LogLevel::DEBUG);
+void usage(const char *prog) {
+	printf("Usage: %s [OPTIONS]\n\n", prog);
+	printf(" -h  --help             Show this help\n");
+	printf(" -l  --list-devices     List all registered devices\n");
+	printf(" -S  --secure           Enable additional security\n");
+	printf(" -p  --profile          Show current profile\n");
+	printf("     --sms NUMBER       Send an SMS verification code\n");
+	printf("     --voice NUMBER     Send voice verification code\n");
+	printf(" -V  --verbose          More verbose output\n");
+	printf(" -v  --version          Library version and quit\n");
+}
 
-	SIGNAL_LOG_INFO << "Library version " << signal::getVersion();
+int main(int argc, char *argv[]) {
+	int opt= 0;
+
+	static struct option long_options[] = {
+		{"list-devices",   no_argument,       0,  'l' },
+		{"profile",        no_argument,       0,  'p' },
+		{"sms",            required_argument, 0,  'S' },
+		{"voice",          required_argument, 0,  'O' },
+		{"secure",         no_argument,       0,  's' },
+		{"verbose",        no_argument,       0,  'V' },
+		{"help",           no_argument,       0,  'h' },
+		{"version",        no_argument,       0,  'v' },
+		{0,                0,                 0,   0  }
+	};
+
+	int long_index = 0;
+	while ((opt = getopt_long(argc, argv, "lpvhV", long_options, &long_index )) != -1) {
+		switch (opt) {
+			case 'l' :
+				break;
+			case 'p' :
+				break;
+			case 'S' :
+				// optarg
+				break;
+			case 'O' :
+				// optarg
+				break;
+			case 's' :
+				break;
+			case 'V' :
+				signal::Logger::setLogLevel(signal::LogLevel::DEBUG);
+				break;
+			case 'h' :
+				usage(argv[0]);
+				return 0;
+			case 'v' :
+				printf("Version %s\n", signal::getVersion());
+				return 0;
+			default:
+				usage(argv[0]);
+				return 1;
+		}
+	}
 
 	if (!signal::Registration::everDone(storage)) {
-		registerClient();
+		register_client();
 	}
 
 	// openInbox();
