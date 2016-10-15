@@ -6,7 +6,7 @@
 
 #define USERAGENT 	"Signal++/0.1"
 
-using namespace signal;
+using namespace signalpp;
 
 //TODO: verification callback
 bool TextSecureServer::performCall(enum urlCall call, enum httpType type, const std::string& param) {
@@ -151,4 +151,31 @@ bool TextSecureServer::confirmCode(const std::string& number,
 	m_username = number;
 	m_password = password;
 	return performCall(call, PUT, urlPrefix + std::to_string(code));
+}
+
+int TextSecureServer::getMessageSocket() {
+	std::string url = getUrl();
+
+	replace(url, "https://", "wss://");
+	replace(url, "http://", "ws://");
+
+	//TODO: username,password must be base64
+	url += "/v1/websocket/?login=" + m_username + "&password=" + m_password + "&agent=OWD";
+
+	SIGNAL_LOG_DEBUG << "Opening websocket to " << url;
+	// return new WebSocket(url);
+	return 1;
+}
+
+int TextSecureServer::getProvisioningSocket() {
+	std::string url = getUrl();
+
+	replace(url, "https://", "wss://");
+	replace(url, "http://", "ws://");
+
+	url += "/v1/websocket/provisioning/?agent=OWD";
+
+	SIGNAL_LOG_DEBUG << "Opening websocket to " << url;
+	// return new WebSocket(url);
+	return 1;
 }

@@ -5,7 +5,7 @@
 
 #include <unistd.h>
 
-namespace signal {
+namespace signalpp {
 
 namespace {
 
@@ -31,7 +31,7 @@ static bool replace(std::string& str, const std::string& from, const std::string
 
 } // namespace
 
-} // namespace signal
+} // namespace signalpp
 
 #endif // _HELPER_H_
 

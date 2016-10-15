@@ -4,15 +4,15 @@
 
 #include <getopt.h>
 
-#include <signal/signal.h>
+#include <signalpp/signalpp.h>
 
-signal::Storage<signal::Ldb> storage;
+signalpp::Storage<signalpp::Ldb> storage;
 
 void register_client() {
 	std::string username = storage.get("username");
 	std::string password = storage.get("password");
 
-	signal::AccountManager accountManager(signal::serverUrl, signal::serverPorts, username, password);
+	signalpp::AccountManager accountManager(signalpp::serverUrl, signalpp::serverPorts, username, password);
 
 	/* For the moment just show the URL */
 	auto provisionUrl = [] (const std::string& url) {
@@ -26,7 +26,7 @@ void register_client() {
 	};
 
 	if (accountManager.registerSecondDevice(provisionUrl, confirmNumber)) {
-		signal::Registration::markDone(storage);
+		signalpp::Registration::markDone(storage);
 	}
 
 	// textsecure:contactsync
@@ -75,13 +75,13 @@ int main(int argc, char *argv[]) {
 			case 's' :
 				break;
 			case 'V' :
-				signal::Logger::setLogLevel(signal::LogLevel::DEBUG);
+				signalpp::Logger::setLogLevel(signalpp::LogLevel::DEBUG);
 				break;
 			case 'h' :
 				usage(argv[0]);
 				return 0;
 			case 'v' :
-				printf("Version %s\n", signal::getVersion());
+				printf("Version %s\n", signalpp::getVersion());
 				return 0;
 			default:
 				usage(argv[0]);
@@ -89,7 +89,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
-	if (!signal::Registration::everDone(storage)) {
+	if (!signalpp::Registration::everDone(storage)) {
 		register_client();
 	}
 

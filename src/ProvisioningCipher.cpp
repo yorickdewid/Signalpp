@@ -2,7 +2,7 @@
 #include "CryptoProvider.h"
 #include "ProvisioningCipher.h"
 
-using namespace signal;
+using namespace signalpp;
 
 char *convert_public_key(ec_public_key *key) {
 	signal_buffer *buffer;

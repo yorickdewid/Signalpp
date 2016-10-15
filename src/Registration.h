@@ -3,7 +3,7 @@
 
 #include "Storage.h"
 
-namespace signal {
+namespace signalpp {
 
 namespace Registration {
 
@@ -32,7 +32,7 @@ static void remove(class StorageContainer& storage) {
 
 } // namespace Registration
 
-} // namespace signal
+} // namespace signalpp
 
 #endif // _REGISTRATION_H_
 

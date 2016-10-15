@@ -5,16 +5,14 @@
 
 #include <sstream>
 
-using namespace signal;
+using namespace signalpp;
 
 bool AccountManager::registerSecondDevice(std::function<void(const std::string&)> setProvisioningUrl,
 											std::function<std::string(const std::string&)> confirmNumber) {
 	ProvisioningCipher provisioningCipher;
 
-	/* Open socket */	
+	/* Open socket */
 	int socket = m_server->getProvisioningSocket();
-
-	m_server->getProvisioningSocket();
 
 	WebSocketResource(socket, [&] (IncomingWebSocketRequest request) {
 

@@ -1,7 +1,7 @@
 #ifndef _CONFIG_H_
 #define _CONFIG_H_
 
-namespace signal {
+namespace signalpp {
 
 /* Version */
 constexpr int majorVersion = 0;
@@ -14,6 +14,6 @@ static const char serverUrl[] = "https://textsecure-service-ca.whispersystems.or
 static const char AttachmentServerUrl[] = "https://whispersystems-textsecure-attachments.s3.amazonaws.com";
 static const unsigned short serverPorts[] = {80, 4433, 8443, 0};
 
-}; // namespace signal
+}; // namespace signalpp
 
 #endif // _CONFIG_H_

@@ -3,7 +3,7 @@
 
 #include <signal_protocol.h>
 
-namespace signal {
+namespace signalpp {
 
 class ProvisioningCipher {
 	signal_context *context;
@@ -17,6 +17,6 @@ class ProvisioningCipher {
 	char *getPublicKey();
 };
 
-} // namespace signal
+} // namespace signalpp
 
 #endif // _PROVISIONINGCIPHER_H_

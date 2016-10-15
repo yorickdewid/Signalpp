@@ -9,22 +9,22 @@
 #include <sstream>
 
 #define SIGNAL_LOG_CRITICAL   \
-	if (signal::Logger::getCurrentLogLevel() <= signal::LogLevel::CRITICAL) \
-		signal::Logger("CRITICAL", signal::LogLevel::CRITICAL)
+	if (signalpp::Logger::getCurrentLogLevel() <= signalpp::LogLevel::CRITICAL) \
+		signalpp::Logger("CRITICAL", signalpp::LogLevel::CRITICAL)
 #define SIGNAL_LOG_ERROR      \
-	if (signal::Logger::getCurrentLogLevel() <= signal::LogLevel::ERROR) \
-		signal::Logger("ERROR   ", signal::LogLevel::ERROR)
+	if (signalpp::Logger::getCurrentLogLevel() <= signalpp::LogLevel::ERROR) \
+		signalpp::Logger("ERROR   ", signalpp::LogLevel::ERROR)
 #define SIGNAL_LOG_WARNING    \
-	if (signal::Logger::getCurrentLogLevel() <= signal::LogLevel::WARNING) \
-		signal::Logger("WARNING ", signal::LogLevel::WARNING)
+	if (signalpp::Logger::getCurrentLogLevel() <= signalpp::LogLevel::WARNING) \
+		signalpp::Logger("WARNING ", signalpp::LogLevel::WARNING)
 #define SIGNAL_LOG_INFO       \
-	if (signal::Logger::getCurrentLogLevel() <= signal::LogLevel::INFO) \
-		signal::Logger("INFO    ", signal::LogLevel::INFO)
+	if (signalpp::Logger::getCurrentLogLevel() <= signalpp::LogLevel::INFO) \
+		signalpp::Logger("INFO    ", signalpp::LogLevel::INFO)
 #define SIGNAL_LOG_DEBUG      \
-	if (signal::Logger::getCurrentLogLevel() <= signal::LogLevel::DEBUG) \
-		signal::Logger("DEBUG   ", signal::LogLevel::DEBUG)
+	if (signalpp::Logger::getCurrentLogLevel() <= signalpp::LogLevel::DEBUG) \
+		signalpp::Logger("DEBUG   ", signalpp::LogLevel::DEBUG)
 
-namespace signal {
+namespace signalpp {
 
 enum class LogLevel {
 	DEBUG = 0,
@@ -116,6 +116,6 @@ class Logger {
 	}
 };
 
-} // namespace signal
+} // namespace signalpp
 
 #endif // _LOGGER_H_

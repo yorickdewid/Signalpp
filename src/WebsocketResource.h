@@ -3,7 +3,10 @@
 
 #include <functional>
 
-namespace signal {
+// #include <websocketpp/config/asio_no_tls_client.hpp>
+// #include <websocketpp/client.hpp>
+
+namespace signalpp {
 
 struct IncomingWebSocketRequest {
 	std::string verb;
@@ -84,6 +87,6 @@ class WebSocketResource {
   	void close() {}
 };
 
-} // namespace signal
+} // namespace signalpp
 
 #endif // _WEBSOCKET_RESOURCE_H_

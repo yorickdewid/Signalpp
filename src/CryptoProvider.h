@@ -3,7 +3,7 @@
 
 #include <signal_protocol.h>
 
-namespace signal {
+namespace signalpp {
 
 namespace CryptoProvider {
 
@@ -11,6 +11,6 @@ void hook(signal_context *context);
 
 } // namespace CryptoProvider
 
-} // namespace signal
+} // namespace signalpp
 
 #endif // _CRYPTOPROVIDER_H_

@@ -5,7 +5,7 @@
 #include <openssl/rand.h>
 #include <openssl/sha.h>
 
-using namespace signal;
+using namespace signalpp;
 
 /*
  * Random byte generator

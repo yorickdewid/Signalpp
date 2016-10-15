@@ -7,7 +7,7 @@
 
 #define DEFAULT_NAME "indexdb"
 
-namespace signal {
+namespace signalpp {
 
 class StorageContainer {
   public:
@@ -96,6 +96,6 @@ class Storage : public StorageContainer {
 	}
 };
 
-} // namespace signal
+} // namespace signalpp
 
 #endif // _STORAGE_H_

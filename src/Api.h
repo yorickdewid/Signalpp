@@ -9,7 +9,7 @@
 #include <sstream>
 #include <map>
 
-namespace signal {
+namespace signalpp {
 
 class PortManager {
 	unsigned int index = 0;
@@ -117,34 +117,10 @@ class TextSecureServer {
 	void getAttachment() {}
 	void putAttachment() {}
 
-	int getMessageSocket() {
-		std::string url = getUrl();
-
-		replace(url, "https://", "wss://");
-		replace(url, "http://", "ws://");
-
-		//TODO: username,password must be base64
-		url += "/v1/websocket/?login=" + m_username + "&password=" + m_password + "&agent=OWD";
-
-		SIGNAL_LOG_DEBUG << "Opening websocket to " << url;
-		// return new WebSocket(url);
-		return 1;
-	}
-
-	int getProvisioningSocket() {
-		std::string url = getUrl();
-
-		replace(url, "https://", "wss://");
-		replace(url, "http://", "ws://");
-
-		url += "/v1/websocket/provisioning/?agent=OWD";
-
-		SIGNAL_LOG_DEBUG << "Opening websocket to " << url;
-		// return new WebSocket(url);
-		return 1;
-	}
+	int getMessageSocket();
+	int getProvisioningSocket();
 };
 
-} // namespace signal
+} // namespace signalpp
 
 #endif // _API_H_

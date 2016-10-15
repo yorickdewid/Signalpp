@@ -1,7 +1,7 @@
 #ifndef _ERROR_H_
 #define _ERROR_H_
 
-namespace signal {
+namespace signalpp {
 
 class Error {
 public:
@@ -24,6 +24,6 @@ public:
 
 };
 
-} // namespace signal
+} // namespace signalpp
 
 #endif // _ERROR_H_

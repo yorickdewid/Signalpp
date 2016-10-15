@@ -6,7 +6,7 @@
 #include <functional>
 #include <memory>
 
-namespace signal {
+namespace signalpp {
 
 class AccountManager {
 	std::unique_ptr<TextSecureServer> m_server;
@@ -27,14 +27,18 @@ public:
 	    m_server->requestVerificationSMS(number);
 	}
 
-	bool registerSingleDevice() { return false; }
+	bool registerSingleDevice() {
+		return false;
+	}
+
 	bool registerSecondDevice(std::function<void (const std::string&)> setProvisioningUrl,
 								std::function<std::string(const std::string&)> confirmNumber);
+
 	void refreshPreKeys() {}
 	void createAccount(const std::string& number, int provisioningCode, const std::string& deviceName);
 	void generateKeys() {}
 };
 
-} // namespace signal
+} // namespace signalpp
 
 #endif // _ACCOUNT_MANAGER_H_
