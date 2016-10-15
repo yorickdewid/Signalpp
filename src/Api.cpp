@@ -4,11 +4,15 @@
 
 #include <curl/curl.h>
 
+#define USERAGENT 	"Signal++/0.1"
+
 using namespace signal;
 
-void TextSecureServer::performCall(enum urlCall call, enum httpType type, const std::string& param) {
+//TODO: verification callback
+bool TextSecureServer::performCall(enum urlCall call, enum httpType type, const std::string& param) {
 	CURL *curl;
 	CURLcode res;
+	bool response = true;
 
 	std::ostringstream url;
 	url << m_url;
@@ -18,7 +22,7 @@ void TextSecureServer::performCall(enum urlCall call, enum httpType type, const 
 	url << endpoint[call];
 	url << param;
 
-	SIGNAL_LOG_DEBUG << "Perform API call with:";// << m_url << '/' << endpoint[call] << param;
+	SIGNAL_LOG_DEBUG << "Perform API call with:";
 	SIGNAL_LOG_DEBUG << "  url: " << url.str();
 	SIGNAL_LOG_DEBUG << "  type: " << type;
 	SIGNAL_LOG_DEBUG << "  data: (null)";
@@ -32,6 +36,9 @@ void TextSecureServer::performCall(enum urlCall call, enum httpType type, const 
 	if (curl) {
 		curl_easy_setopt(curl, CURLOPT_URL, url.str().c_str());
 
+		//TODO: HTTP type
+		//TODO: data
+
 #ifdef SKIP_PEER_VERIFICATION
 		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
 #endif
@@ -39,39 +46,36 @@ void TextSecureServer::performCall(enum urlCall call, enum httpType type, const 
 #ifdef SKIP_HOSTNAME_VERIFICATION
 		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
 #endif
+		struct curl_slist *headers = nullptr;
 
-		/* Perform the request, res will get the return code */ 
+		headers = curl_slist_append(headers, "Content-Type: application/json; charset=utf-8");
+
+		/* Pass custom headers */
+		curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+
+		/* User agent */
+		curl_easy_setopt(curl, CURLOPT_USERAGENT, USERAGENT);
+
+		/* Basic authentication */
+		if (!m_username.empty() && !m_password.empty()) {
+			curl_easy_setopt(curl, CURLOPT_HTTPAUTH, (long)CURLAUTH_BASIC);
+			curl_easy_setopt(curl, CURLOPT_USERPWD, (m_username + ":" + m_password).c_str());
+		}
+
+		/* Perform the request */ 
 		res = CURLE_OK;//curl_easy_perform(curl);
+		//res = curl_easy_perform(curl);
 
 		/* Check for errors */ 
-		if (res != CURLE_OK)
+		if (res != CURLE_OK) {
 			SIGNAL_LOG_ERROR << "curl_easy_perform() failed: " << curl_easy_strerror(res);
-
-		/* always cleanup */ 
-		curl_easy_cleanup(curl);
-	}
-
-	curl_global_cleanup();
-
-	/*return ajax(null, {
-			host        : m_url,
-			ports       : this.portManager.ports,
-			path        : endpoint[call] + param.urlParameters,
-			type        : type,
-			data        : param.jsonData && textsecure.utils.jsonThing(param.jsonData),
-			contentType : 'application/json; charset=utf-8',
-			dataType    : 'json',
-			user        : m_username,
-			password    : m_password,
-			validateResponse: param.validateResponse
-	}).catch(function(e) {
-		var code = e.code;
-		if (code === 200) {
-			// happens sometimes when we get no response
-			// (TODO: Fix server to return 204? instead)
-			return null;
+			response = false;
 		}
-		var message;
+
+		long code = 0;
+		curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &code);
+
+		std::string message;
 		switch (code) {
 			case -1:
 				message = "Failed to connect to the server, please check your network connection.";
@@ -83,7 +87,7 @@ void TextSecureServer::performCall(enum urlCall call, enum httpType type, const 
 				message = "Invalid code, please try again.";
 				break;
 			case 417:
-				// TODO: This shouldn't be a thing?, but its in the API doc?
+				//TODO: This shouldn't be a thing?, but its in the API doc?
 				message = "Number already registered.";
 				break;
 			case 401:
@@ -92,13 +96,59 @@ void TextSecureServer::performCall(enum urlCall call, enum httpType type, const 
 			case 404:
 				message = "Number is not registered.";
 				break;
+			case 500:
+				message = "Internal server error.";
+				break;
 			default:
 				message = "The server rejected our query, please file a bug report.";
 		}
-		e.message = message
-		throw e;
-	});*/
+
+		SIGNAL_LOG_DEBUG << "Response code: " << code;
+		SIGNAL_LOG_ERROR << message;
+
+		curl_slist_free_all(headers); /* free the header list */
+
+		/* always cleanup */ 
+		curl_easy_cleanup(curl);
+	} else {
+		response = false;
+	}
+
+	curl_global_cleanup();
+
+	return response;
 }
 
+bool TextSecureServer::confirmCode(const std::string& number,
+									int code,
+									const std::string& password,
+									const std::string& signaling_key,
+									int registrationId,
+									const std::string& deviceName) {
+	/*var jsonData = {
+		signalingKey    : btoa(getString(signaling_key)),
+		supportsSms     : false,
+		fetchesMessages : true,
+		registrationId  : registrationId,
+	};
 
-//
+	return this.ajax({
+		jsonData            : jsonData,
+	});*/
+
+	enum urlCall call;
+	std::string urlPrefix;
+
+	if (!deviceName.empty()) {
+		//jsonData.name = deviceName;
+		call = DEVICES;
+		urlPrefix = "/";
+	} else {
+		call = ACCOUNTS;
+		urlPrefix = "/code/";
+	}
+
+	m_username = number;
+	m_password = password;
+	return performCall(call, PUT, urlPrefix + std::to_string(code));
+}

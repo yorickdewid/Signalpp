@@ -50,7 +50,7 @@ class TextSecureServer {
 
 	std::map<enum urlCall, std::string> endpoint;
 	
-	void performCall(enum urlCall call, enum httpType type, const std::string& param);
+	bool performCall(enum urlCall call, enum httpType type, const std::string& param = "");
 
   public:
 	TextSecureServer(const std::string& url,
@@ -84,20 +84,52 @@ class TextSecureServer {
 		return os.str();
 	}
 
-	inline void requestVerificationSMS(const std::string& number) {
+	inline bool requestVerificationSMS(const std::string& number) {
 		return performCall(ACCOUNTS, GET, "/sms/code/" + number);
 	}
 
-	void requestVerificationVoice(const std::string& number) {}
-	void confirmCode() {}
-	void getDevices() {}
+	inline bool requestVerificationVoice(const std::string& number) {
+		return performCall(ACCOUNTS, GET, "/voice/code/" + number);
+	}
+
+	bool confirmCode(const std::string& number,
+						int code,
+						const std::string& password,
+						const std::string& signaling_key,
+						int registrationId,
+						const std::string& deviceName);
+
+	bool getDevices() {
+		return performCall(DEVICES, GET);
+	}
+
 	void registerKeys() {}
 	void getMyKeys() {}
 	void getKeysForNumber() {}
-	void sendMessages() {}
+
+	bool sendMessages(const std::string& destination, char *messageArray, int timestamp) {
+		// var jsonData = { messages: messageArray, timestamp: timestamp};
+
+		//TODO: pass jsonData as data
+		return performCall(MESSAGES, PUT, "/" + destination);
+	}
+
 	void getAttachment() {}
 	void putAttachment() {}
-	void getMessageSocket() {}
+
+	int getMessageSocket() {
+		std::string url = getUrl();
+
+		replace(url, "https://", "wss://");
+		replace(url, "http://", "ws://");
+
+		//TODO: username,password must be base64
+		url += "/v1/websocket/?login=" + m_username + "&password=" + m_password + "&agent=OWD";
+
+		SIGNAL_LOG_DEBUG << "Opening websocket to " << url;
+		// return new WebSocket(url);
+		return 1;
+	}
 
 	int getProvisioningSocket() {
 		std::string url = getUrl();
