@@ -117,8 +117,8 @@ class TextSecureServer {
 	void getAttachment() {}
 	void putAttachment() {}
 
-	int getMessageSocket();
-	int getProvisioningSocket();
+	std::string getMessageSocket();
+	std::string getProvisioningSocket();
 };
 
 } // namespace signalpp
