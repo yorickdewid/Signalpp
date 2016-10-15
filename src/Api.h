@@ -7,6 +7,7 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <map>
 
 namespace signal {
 
@@ -32,13 +33,24 @@ class TextSecureServer {
 	std::string m_attachUrl;
 	PortManager m_portManager;
 
-	/*enum urlClass {
-        accounts   : "v1/accounts",
-        devices    : "v1/devices",
-        keys       : "v2/keys",
-        messages   : "v1/messages",
-        attachment : "v1/attachments"
-	};*/
+	enum urlCall {
+		ACCOUNTS,
+		DEVICES,
+		KEYS,
+		MESSAGES,
+		ATTACHMENT,
+	};
+
+	enum httpType {
+		GET,
+		PUT,
+		POST,
+		DELETE,
+	};
+
+	std::map<enum urlCall, std::string> endpoint;
+	
+	void performCall(enum urlCall call, enum httpType type, const std::string& param);
 
   public:
 	TextSecureServer(const std::string& url,
@@ -55,6 +67,13 @@ class TextSecureServer {
 			m_portManager.add(ports[i]);
 			++i;
 		}
+
+		/* API call endpoints */
+		endpoint[ACCOUNTS]   = "v1/accounts";
+		endpoint[DEVICES]    = "v1/devices";
+		endpoint[KEYS]       = "v2/keys";
+		endpoint[MESSAGES]   = "v1/messages";
+		endpoint[ATTACHMENT] = "v1/attachments";
 	}
 
 	inline std::string getUrl() {
@@ -65,8 +84,10 @@ class TextSecureServer {
 		return os.str();
 	}
 
-	void performCall() {} /* cURL */
-	void requestVerificationSMS(const std::string& number) {}
+	inline void requestVerificationSMS(const std::string& number) {
+		return performCall(ACCOUNTS, GET, "/sms/code/" + number);
+	}
+
 	void requestVerificationVoice(const std::string& number) {}
 	void confirmCode() {}
 	void getDevices() {}

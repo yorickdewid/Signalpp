@@ -1,5 +1,5 @@
 RANLIB=ranlib
-LIBSRC=CryptoProvider.cpp AccountManager.cpp ProvisioningCipher.cpp
+LIBSRC=CryptoProvider.cpp AccountManager.cpp ProvisioningCipher.cpp Api.cpp
 LIBOBJ=$(LIBSRC:.cpp=.o)
 
 CXXFLAGS=-Wall -g -O0 -std=c++11 -I../libsignal-protocol-c/src/ -DENABLE_LOGGING -Wno-unused-function -Wno-unused-variable
