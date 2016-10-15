@@ -1,4 +1,5 @@
 #include "Api.h"
+#include "Base64.h"
 
 #include <sstream>
 
@@ -153,21 +154,20 @@ bool TextSecureServer::confirmCode(const std::string& number,
 	return performCall(call, PUT, urlPrefix + std::to_string(code));
 }
 
-int TextSecureServer::getMessageSocket() {
+std::string TextSecureServer::getMessageSocket() {
 	std::string url = getUrl();
 
 	replace(url, "https://", "wss://");
 	replace(url, "http://", "ws://");
 
-	//TODO: username,password must be base64
-	url += "/v1/websocket/?login=" + m_username + "&password=" + m_password + "&agent=OWD";
+	url += "/v1/websocket/?login=" + Base64::Encode(m_username) + "&password=" + Base64::Encode(m_password) + "&agent=OWD";
 
-	SIGNAL_LOG_DEBUG << "Opening websocket to " << url;
-	// return new WebSocket(url);
-	return 1;
+	SIGNAL_LOG_DEBUG << "Websocket to " << url;
+
+	return url;
 }
 
-int TextSecureServer::getProvisioningSocket() {
+std::string TextSecureServer::getProvisioningSocket() {
 	std::string url = getUrl();
 
 	replace(url, "https://", "wss://");
@@ -175,7 +175,7 @@ int TextSecureServer::getProvisioningSocket() {
 
 	url += "/v1/websocket/provisioning/?agent=OWD";
 
-	SIGNAL_LOG_DEBUG << "Opening websocket to " << url;
-	// return new WebSocket(url);
-	return 1;
+	SIGNAL_LOG_DEBUG << "Websocket to " << url;
+
+	return url;
 }
