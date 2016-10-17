@@ -37,7 +37,22 @@ bool TextSecureServer::performCall(enum urlCall call, enum httpType type, const 
 	if (curl) {
 		curl_easy_setopt(curl, CURLOPT_URL, url.str().c_str());
 
-		//TODO: HTTP type
+		/* Set HTTP type */
+		switch (type) {
+			case GET:
+				curl_easy_setopt(curl, CURLOPT_HTTPGET, 1L);
+				break;
+			case PUT:
+				curl_easy_setopt(curl, CURLOPT_PUT, 1L);
+				break;
+			case POST:
+				curl_easy_setopt(curl, CURLOPT_POST, 1L);
+				break;
+			case DELETE:
+				curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "DELETE"); 
+				break;
+		}
+
 		//TODO: data
 
 #ifdef SKIP_PEER_VERIFICATION
@@ -155,6 +170,7 @@ bool TextSecureServer::confirmCode(const std::string& number,
 }
 
 std::string TextSecureServer::getMessageSocket() {
+	// Websocket<DummyHandler> socket;
 	std::string url = getUrl();
 
 	replace(url, "https://", "wss://");
@@ -164,10 +180,15 @@ std::string TextSecureServer::getMessageSocket() {
 
 	SIGNAL_LOG_DEBUG << "Websocket to " << url;
 
-	return url;
+	// if (!socket.connect(url)) {
+	// 	SIGNAL_LOG_ERROR << "Failed creating websocket";
+	// }
+
+	return url;//socket;
 }
 
 std::string TextSecureServer::getProvisioningSocket() {
+	// Websocket<DummyHandler> socket;
 	std::string url = getUrl();
 
 	replace(url, "https://", "wss://");
@@ -177,5 +198,10 @@ std::string TextSecureServer::getProvisioningSocket() {
 
 	SIGNAL_LOG_DEBUG << "Websocket to " << url;
 
+	// if (!socket.connect(url)) {
+	// 	SIGNAL_LOG_ERROR << "Failed creating websocket";
+	// }
+
+	// return socket; <--
 	return url;
 }
