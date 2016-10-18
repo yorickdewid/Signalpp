@@ -50,7 +50,7 @@ class TextSecureServer {
 
 	std::map<enum urlCall, std::string> endpoint;
 	
-	bool performCall(enum urlCall call, enum httpType type, const std::string& param = "");
+	bool performCall(enum urlCall call, enum httpType type, const std::string& param = "", const std::string& data = "");
 
   public:
 	TextSecureServer(const std::string& url,

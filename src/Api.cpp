@@ -9,8 +9,13 @@
 
 using namespace signalpp;
 
+struct dataObject {
+	const char *readptr;
+	long sizeleft;
+};
+
 //TODO: verification callback
-bool TextSecureServer::performCall(enum urlCall call, enum httpType type, const std::string& param) {
+bool TextSecureServer::performCall(enum urlCall call, enum httpType type, const std::string& param, const std::string& data) {
 	CURL *curl;
 	CURLcode res;
 	bool response = true;
@@ -54,6 +59,14 @@ bool TextSecureServer::performCall(enum urlCall call, enum httpType type, const 
 		}
 
 		//TODO: data
+		if (!data.empty()) {
+			// struct dataObject writeback;
+
+			// writeback.readptr = data;
+			// writeback.sizeleft = (long)strlen(data);
+			/* pointer to pass to the read function */ 
+			// curl_easy_setopt(curl, CURLOPT_READDATA, &writeback);
+		}
 
 #ifdef SKIP_PEER_VERIFICATION
 		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
