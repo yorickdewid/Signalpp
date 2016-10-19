@@ -11,40 +11,45 @@ int c_callback(struct lws *wsi, enum lws_callback_reasons reason,
 
 	switch (reason) {
 		case LWS_CALLBACK_CLIENT_ESTABLISHED:
-			if (ws)
+			if (ws) {
 				ws->setStatus(WebsocketStatus::OPEN);
-			SIGNAL_LOG_DEBUG << "LWS_CALLBACK_CLIENT_ESTABLISHED";
+				ws->callOpen();
+				SIGNAL_LOG_DEBUG << "Call onOpen";
+			}
 			break;
 
 		case LWS_CALLBACK_CLOSED:
-			if (ws)
+			if (ws) {
 				ws->setStatus(WebsocketStatus::CLOSED);
-			SIGNAL_LOG_DEBUG << "LWS_CALLBACK_CLOSED";
+				ws->callClose();
+				SIGNAL_LOG_DEBUG << "Call onClose";
+			}
 			break;
 
 		case LWS_CALLBACK_CLIENT_RECEIVE: {
-			SIGNAL_LOG_DEBUG << "LWS_CALLBACK_CLIENT_RECEIVE";
-			char *q = (char *)malloc(len + 1);
-			memcpy(q, in, len);
-			q[len] = '\0';
-			printf("rx %zu\n", len);
+			if (ws) {
+				ws->callMessage(std::string((char *)in, len));
+				SIGNAL_LOG_DEBUG << "Call onMessage";
+			}
 			break;
 		}
 
 		case LWS_CALLBACK_CLIENT_CONNECTION_ERROR:
-			if (ws)
+			if (ws) {
 				ws->setStatus(WebsocketStatus::FAILED);
-			SIGNAL_LOG_DEBUG << "LWS_CALLBACK_CLIENT_CONNECTION_ERROR";
+				ws->callFail();
+				SIGNAL_LOG_DEBUG << "Call onFail";
+			}
 			break;
 
 		case LWS_CALLBACK_CLIENT_CONFIRM_EXTENSION_SUPPORTED:
-			if (strcmp((char *)in, "deflate-stream") == 0) {
-				SIGNAL_LOG_DEBUG << "denied deflate-stream extension";
+			if (!strcmp((char *)in, "deflate-stream")) {
+				SIGNAL_LOG_WARNING << "denied deflate-stream extension";
 				return 1;
 			}
-			if ((strcmp((char *)in, "x-webkit-deflate-frame") == 0))
+			if (!strcmp((char *)in, "x-webkit-deflate-frame"))
 				return 1;
-			if ((strcmp((char *)in, "deflate-frame") == 0))
+			if (!strcmp((char *)in, "deflate-frame"))
 				return 1;
 			break;
 
@@ -87,6 +92,7 @@ Websocket::Websocket(const std::string& uri) {
 		return;
 	}
 
+	/* Ship the class instance */
 	protocols[0].user = this;
 
 	/* Find path */
@@ -96,9 +102,9 @@ Websocket::Websocket(const std::string& uri) {
 	m_conn_info.path = path;
 
 	if (!strcmp(proto, "http") || !strcmp(proto, "ws"))
-		m_ssl = 0;
+		m_ssl = false;
 	if (!strcmp(proto, "https") || !strcmp(proto, "wss"))
-		m_ssl = 1;
+		m_ssl = true;
 
 	m_info.port = CONTEXT_PORT_NO_LISTEN;
 	m_info.protocols = protocols;
@@ -126,10 +132,16 @@ Websocket::Websocket(const std::string& uri) {
 
 Websocket::~Websocket() {
 	SIGNAL_LOG_INFO << "Websocket closing connection";
+
+	if (m_status == WebsocketStatus::OPEN) {
+		SIGNAL_LOG_DEBUG << "Websocket still open";
+		close();
+	}
+
 	lws_context_destroy(m_context);
 }
 
-bool Websocket::connect() {
+void Websocket::connect() {
 	while (true) {
 
 		if (!m_wsi) {
@@ -140,6 +152,6 @@ bool Websocket::connect() {
 			m_status = WebsocketStatus::CONNECT;
 		}
 
-		lws_service(m_context, 500);
+		lws_service(m_context, m_conn_timeout);
 	}
 }
