@@ -3,6 +3,7 @@
 
 #include "Logger.h"
 #include "Helper.h"
+#include "Websocket.h"
 
 #include <vector>
 #include <string>
@@ -118,7 +119,7 @@ class TextSecureServer {
 	void putAttachment() {}
 
 	std::string getMessageSocket();
-	std::string getProvisioningSocket();
+	Websocket *getProvisioningSocket();
 };
 
 } // namespace signalpp

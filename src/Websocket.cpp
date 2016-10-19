@@ -79,15 +79,15 @@ static const struct lws_extension exts[] = {
 };
 
 Websocket::Websocket(const std::string& uri) {
-	char path[312];
-	const char *proto, *p;
+	const char *_proto, *_path, *_address;
 
 	m_status = WebsocketStatus::CLOSED;
 
 	memset(&m_info, 0, sizeof(m_info));
 	memset(&m_conn_info, 0, sizeof(m_conn_info));
 
-	if (lws_parse_uri((char *)uri.c_str(), &proto, &m_conn_info.address, &m_conn_info.port, &p)) {
+	/* Parse URI */
+	if (lws_parse_uri((char *)uri.c_str(), &_proto, &_address, &m_conn_info.port, &_path)) {
 		SIGNAL_LOG_ERROR << "Parsing uri error";
 		return;
 	}
@@ -95,15 +95,21 @@ Websocket::Websocket(const std::string& uri) {
 	/* Ship the class instance */
 	protocols[0].user = this;
 
+	/* Address */
+	char *address = (char *)calloc(strlen(_address) + 1, sizeof(char));
+	strcpy(address, _address);
+	m_conn_info.address = address;
+
 	/* Find path */
+	char *path = (char *)calloc(strlen(_path) + 2, sizeof(char));
 	path[0] = '/';
-	strncpy(path + 1, p, sizeof(path) - 2);
-	path[sizeof(path) - 1] = '\0';
+	strcpy(&path[1], _path);
 	m_conn_info.path = path;
 
-	if (!strcmp(proto, "http") || !strcmp(proto, "ws"))
+	/* Set secure flag if requested */
+	if (!strcmp(_proto, "http") || !strcmp(_proto, "ws"))
 		m_ssl = false;
-	if (!strcmp(proto, "https") || !strcmp(proto, "wss"))
+	if (!strcmp(_proto, "https") || !strcmp(_proto, "wss"))
 		m_ssl = true;
 
 	m_info.port = CONTEXT_PORT_NO_LISTEN;
@@ -133,6 +139,9 @@ Websocket::Websocket(const std::string& uri) {
 Websocket::~Websocket() {
 	SIGNAL_LOG_INFO << "Websocket closing connection";
 
+	free((void *)m_conn_info.address);
+	free((void *)m_conn_info.path);
+
 	if (m_status == WebsocketStatus::OPEN) {
 		SIGNAL_LOG_DEBUG << "Websocket still open";
 		close();
@@ -143,13 +152,12 @@ Websocket::~Websocket() {
 
 void Websocket::connect() {
 	while (true) {
-
 		if (!m_wsi) {
 			SIGNAL_LOG_DEBUG << "Connecting ...";
 			m_conn_info.protocol = protocols[0].name;
 			m_wsi = lws_client_connect_via_info(&m_conn_info);
-
-			m_status = WebsocketStatus::CONNECT;
+			if (m_wsi)
+				m_status = WebsocketStatus::CONNECT;
 		}
 
 		lws_service(m_context, m_conn_timeout);

@@ -183,7 +183,6 @@ bool TextSecureServer::confirmCode(const std::string& number,
 }
 
 std::string TextSecureServer::getMessageSocket() {
-	// Websocket<DummyHandler> socket;
 	std::string url = getUrl();
 
 	replace(url, "https://", "wss://");
@@ -193,15 +192,10 @@ std::string TextSecureServer::getMessageSocket() {
 
 	SIGNAL_LOG_DEBUG << "Websocket to " << url;
 
-	// if (!socket.connect(url)) {
-	// 	SIGNAL_LOG_ERROR << "Failed creating websocket";
-	// }
-
 	return url;//socket;
 }
 
-std::string TextSecureServer::getProvisioningSocket() {
-	// Websocket<DummyHandler> socket;
+Websocket *TextSecureServer::getProvisioningSocket() {
 	std::string url = getUrl();
 
 	replace(url, "https://", "wss://");
@@ -211,10 +205,5 @@ std::string TextSecureServer::getProvisioningSocket() {
 
 	SIGNAL_LOG_DEBUG << "Websocket to " << url;
 
-	// if (!socket.connect(url)) {
-	// 	SIGNAL_LOG_ERROR << "Failed creating websocket";
-	// }
-
-	// return socket; <--
-	return url;
+	return new Websocket(url);
 }
