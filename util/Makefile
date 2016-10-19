@@ -1,6 +1,6 @@
 BIN=signalclient
 INCLUDE=-I../include
-LIBS=-lleveldb -lcrypto -lcurl -lboost_system -lboost_random -lboost_thread -lpthread
+LIBS=-lleveldb -lcrypto -lcurl -lssl -lwebsockets -lprotobuf
 CXXFLAGS=-g -O0 -Wall -std=c++11 -I../libsignal-protocol-c/src/ -DENABLE_LOGGING -Wno-unused-function -Wno-unused-variable
 
 all:
