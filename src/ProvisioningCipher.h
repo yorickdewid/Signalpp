@@ -14,7 +14,7 @@ class ProvisioningCipher {
   	~ProvisioningCipher();
 
 	void decrypt() {}
-	char *getPublicKey();
+	std::string getPublicKey();
 };
 
 } // namespace signalpp
