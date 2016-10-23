@@ -39,8 +39,21 @@ public:
 
 	void connect();
 
-	void setStatus(WebsocketStatus status) {
-		m_status = status;
+	void printStatus() {
+		switch (m_status) {
+			case WebsocketStatus::CONNECT:
+				puts("CONNECT");
+				break;
+			case WebsocketStatus::OPEN:
+				puts("OPEN");
+				break;
+			case WebsocketStatus::FAILED:
+				puts("FAILED");
+				break;
+			case WebsocketStatus::CLOSED:
+				puts("CLOSED");
+				break;
+		}
 	}
 
 	/* Call registered routines */
@@ -55,6 +68,7 @@ public:
 		if (!m_onCloseCallback)
 			return;
 
+		m_status = WebsocketStatus::CLOSED;
 		m_onCloseCallback();
 	}
 
@@ -62,6 +76,7 @@ public:
 		if (!m_onOpenCallback)
 			return;
 
+		m_status = WebsocketStatus::OPEN;
 		m_onOpenCallback();
 	}
 
@@ -69,6 +84,7 @@ public:
 		if (!m_onFailCallback)
 			return;
 
+		m_status = WebsocketStatus::FAILED;
 		m_onFailCallback();
 	}
 
@@ -95,10 +111,13 @@ public:
 	}
 
 	void close(enum lws_close_status status = LWS_CLOSE_STATUS_NORMAL, std::string reason = "") {
+		m_status = WebsocketStatus::CLOSED;
 		lws_close_reason(m_wsi, status, (unsigned char *)reason.c_str(), reason.size());
 	}
 
 	void send(std::string message, bool binary = false) {
+		printf("Sending message with size %zu\n", message.size());
+
 		unsigned char *buf = (unsigned char *)malloc(LWS_PRE + message.size());
 		memcpy(&buf[LWS_PRE], message.c_str(), message.size());
 		lws_write(m_wsi, &buf[LWS_PRE], message.size(), binary ? LWS_WRITE_BINARY : LWS_WRITE_TEXT);

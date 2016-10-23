@@ -6,39 +6,39 @@ int c_callback(struct lws *wsi, enum lws_callback_reasons reason,
 			void *user, void *in, size_t len) {
 
 	Websocket *ws = nullptr;
-	if (lws_get_protocol(wsi))
+	if (lws_get_protocol(wsi)) {
 		ws = (Websocket *)lws_get_protocol(wsi)->user;
+
+		// ws->printStatus();
+	}
 
 	switch (reason) {
 		case LWS_CALLBACK_CLIENT_ESTABLISHED:
 			if (ws) {
-				ws->setStatus(WebsocketStatus::OPEN);
-				ws->callOpen();
 				SIGNAL_LOG_DEBUG << "Call onOpen";
+				ws->callOpen();
 			}
 			break;
 
 		case LWS_CALLBACK_CLOSED:
 			if (ws) {
-				ws->setStatus(WebsocketStatus::CLOSED);
-				ws->callClose();
 				SIGNAL_LOG_DEBUG << "Call onClose";
+				ws->callClose();
 			}
 			break;
 
 		case LWS_CALLBACK_CLIENT_RECEIVE: {
 			if (ws) {
-				ws->callMessage(std::string((char *)in, len));
 				SIGNAL_LOG_DEBUG << "Call onMessage";
+				ws->callMessage(std::string((char *)in, len));
 			}
 			break;
 		}
 
 		case LWS_CALLBACK_CLIENT_CONNECTION_ERROR:
 			if (ws) {
-				ws->setStatus(WebsocketStatus::FAILED);
-				ws->callFail();
 				SIGNAL_LOG_DEBUG << "Call onFail";
+				ws->callFail();
 			}
 			break;
 
@@ -137,7 +137,7 @@ Websocket::Websocket(const std::string& uri) {
 }
 
 Websocket::~Websocket() {
-	SIGNAL_LOG_INFO << "Websocket closing connection";
+	SIGNAL_LOG_INFO << "Cleanup";
 
 	free((void *)m_conn_info.address);
 	free((void *)m_conn_info.path);
@@ -151,7 +151,7 @@ Websocket::~Websocket() {
 }
 
 void Websocket::connect() {
-	while (true) {
+	while (m_status == WebsocketStatus::CONNECT || m_status == WebsocketStatus::OPEN || !m_wsi) {
 		if (!m_wsi) {
 			SIGNAL_LOG_DEBUG << "Connecting ...";
 			m_conn_info.protocol = protocols[0].name;
@@ -162,4 +162,6 @@ void Websocket::connect() {
 
 		lws_service(m_context, m_conn_timeout);
 	}
+
+	m_wsi = nullptr;
 }
