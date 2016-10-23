@@ -1,3 +1,4 @@
+#include "Logger.h"
 #include "CryptoProvider.h"
 
 #include <openssl/evp.h>
@@ -20,9 +21,8 @@ static int randomGenerator(uint8_t *data, size_t len, void *user_data) {
 }
 
 /*
- * SHA-512 digest
+ * SHA-256 digest
  */
-
 static int HMAC_SHA256Init(void **hmac_context, const uint8_t *key, size_t key_len, void *user_data) {
 	HMAC_CTX *ctx = (HMAC_CTX *)malloc(sizeof(HMAC_CTX));
 	if (!ctx) {
@@ -323,4 +323,60 @@ void CryptoProvider::hook(signal_context *context) {
 	};
 
 	signal_context_set_crypto_provider(context, &provider);
+}
+
+std::string CryptoProvider::HMAC(std::string& key, std::string& data) {
+	int result = 0;
+	signal_buffer *output_buffer = nullptr;
+	size_t output_len = 0;
+	std::string hash;
+
+	void *hmac_context = nullptr;
+	void *user_data = nullptr;
+	result = HMAC_SHA256Init(&hmac_context, (const uint8_t *)key.data(), key.size(), user_data);
+	if (result < 0) {
+		goto hmac_complete;
+	}
+
+	result = HMAC_SHA256Update(hmac_context, (const uint8_t *)data.data(), data.size(), user_data);
+	if (result < 0) {
+		goto hmac_complete;
+	}
+
+	// result = signal_hmac_sha256_final(context, hmac_context, &output_buffer);
+	result = HMAC_SHA256Final(hmac_context, &output_buffer, user_data);
+	if (result < 0) {
+		goto hmac_complete;
+	}
+
+	hash = std::string((char *)signal_buffer_data(output_buffer), signal_buffer_len(output_buffer));
+
+hmac_complete:
+	HMAC_SHA256Cleanup(hmac_context, user_data);
+	signal_buffer_free(output_buffer);
+
+	if (result < 0) {
+		SIGNAL_LOG_ERROR << "Cannot calculate HMAC";
+		return nullptr;//TODO: throw
+	}
+
+	return hash;
+}
+
+bool CryptoProvider::verifyMAC(std::string& data, std::string& key, std::string& mac, size_t length) {
+	std::string calculatedMAC = HMAC(key, data);
+
+	if (mac.size() != length || calculatedMAC.size() != length) {
+		SIGNAL_LOG_ERROR << "Bad MAC length";
+		return false;//TODO: throw
+	}
+
+	if (!mac.compare(calculatedMAC)) {
+		SIGNAL_LOG_INFO << "MAC CHECK";
+		return true;
+	} else {
+		SIGNAL_LOG_INFO << "MAC WHOOPS";
+	}
+
+	return false;
 }

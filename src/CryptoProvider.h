@@ -3,11 +3,17 @@
 
 #include <signal_protocol.h>
 
+#include <string>
+
 namespace signalpp {
 
 namespace CryptoProvider {
 
 void hook(signal_context *context);
+
+std::string HMAC(std::string& key, std::string& data);
+
+bool verifyMAC(std::string& data, std::string& key, std::string& mac, size_t length);
 
 } // namespace CryptoProvider
 
