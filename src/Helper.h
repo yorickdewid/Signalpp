@@ -3,6 +3,7 @@
 
 #include "Config.h"
 
+#include <iomanip>
 #include <unistd.h>
 
 namespace signalpp {
@@ -28,6 +29,33 @@ static bool replace(std::string& str, const std::string& from, const std::string
 	str.replace(start_pos, from.length(), to);
 	return true;
 }
+
+namespace Url {
+
+static std::string Encode(const std::string &value) {
+    std::ostringstream escaped;
+    escaped.fill('0');
+    escaped << std::hex;
+
+    for (std::string::const_iterator i = value.begin(), n = value.end(); i != n; ++i) {
+        std::string::value_type c = (*i);
+
+        /* Keep alphanumeric and other accepted characters intact */
+        if (isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~') {
+            escaped << c;
+            continue;
+        }
+
+        /* Any other characters are percent-encoded */
+        escaped << std::uppercase;
+        escaped << '%' << std::setw(2) << int((unsigned char) c);
+        escaped << std::nouppercase;
+    }
+
+    return escaped.str();
+}
+
+} // Url
 
 } // namespace
 
