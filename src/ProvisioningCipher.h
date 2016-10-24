@@ -3,7 +3,16 @@
 
 #include <signal_protocol.h>
 
+#include "DeviceMessages.pb.h"
+
 namespace signalpp {
+
+struct ProvisionInfo {
+	ec_key_pair *identityKeyPair;
+	std::string number;
+	std::string provisioningCode;
+	std::string userAgent;
+};
 
 class ProvisioningCipher {
 	signal_context *context;
@@ -13,7 +22,7 @@ class ProvisioningCipher {
   	ProvisioningCipher();
   	~ProvisioningCipher();
 
-	void decrypt() {}
+	ProvisionInfo decrypt(textsecure::ProvisionEnvelope& provisionEnvelope);
 	std::string getPublicKey();
 };
 
