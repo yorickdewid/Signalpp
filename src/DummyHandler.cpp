@@ -55,3 +55,23 @@ public:
 		SIGNAL_LOG_INFO << "Websocket URI: " << m_uri;
 	}
 };
+
+void wsDummyTest() {
+	Websocket<DummyHandler> socket;
+
+	if (!socket.connect("wss://echo.websocket.org:443")) {
+		SIGNAL_LOG_ERROR << "Failed creating websocket";
+	}
+
+	int close_code = websocketpp::close::status::normal;
+
+	// socket.send("test");
+	// socket.close(close_code, "");
+
+	auto metadata = socket.instance();
+	if (metadata) {
+		metadata->printStatus();
+	}
+
+	getchar();
+}

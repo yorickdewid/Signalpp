@@ -3,6 +3,8 @@
 
 #include "Api.h"
 
+#include <signal_protocol.h>
+
 #include <functional>
 #include <memory>
 
@@ -35,7 +37,11 @@ public:
 								std::function<std::string(const std::string&)> confirmNumber);
 
 	void refreshPreKeys() {}
-	void createAccount(const std::string& number, int provisioningCode, const std::string& deviceName);
+	void createAccount(const std::string& number,
+									const std::string& provisioningCode,
+									ec_key_pair *identityKeyPair,
+									const std::string& deviceName,
+									const std::string& userAgent);
 	void generateKeys() {}
 };
 

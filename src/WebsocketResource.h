@@ -1,10 +1,10 @@
 #ifndef _WEBSOCKET_RESOURCE_H_
 #define _WEBSOCKET_RESOURCE_H_
 
-#include <functional>
+#include "Websocket.h"
+#include "WebSocketProtocol.pb.h"
 
-// #include <websocketpp/config/asio_no_tls_client.hpp>
-// #include <websocketpp/client.hpp>
+#include <functional>
 
 namespace signalpp {
 
@@ -12,10 +12,10 @@ struct IncomingWebSocketRequest {
 	std::string verb;
 	std::string path;
 	std::string body;
-	int id;
-	int socket;
+	long long unsigned id;
+	Websocket *socket;
 
-	IncomingWebSocketRequest(std::string _verb, std::string _path, std::string _body, int _id, int _socket)
+	IncomingWebSocketRequest(std::string _verb, std::string _path, std::string _body, long long unsigned _id, Websocket *_socket)
 	: verb(_verb)
 	, path(_path)
 	, body(_body)
@@ -23,18 +23,31 @@ struct IncomingWebSocketRequest {
 	, socket(_socket) {
 		
 		/* Must have an id */
-		if (id == 0) {
+		if (!id) {
 			// id = random 2 byte
 		}
+
+		SIGNAL_LOG_DEBUG << "IncomingWebSocketRequest:";
+		SIGNAL_LOG_DEBUG << " verb: " << verb;
+		SIGNAL_LOG_DEBUG << " path: " << path;
+		SIGNAL_LOG_DEBUG << " pathSz: " << body.size();
+		SIGNAL_LOG_DEBUG << " id: " << id;
 	}
 
-	void respond(unsigned short status, const std::string& message) {
-		// socket.send(
-		//	new textsecure.protobuf.WebSocketMessage({
-		//		type: textsecure.protobuf.WebSocketMessage.Type.RESPONSE,
-		//		response: { id: id, message: message, status: status }
-		//		}).encode().toArrayBuffer()
-		//	);
+	void respond(unsigned short status, const std::string message) {
+		std::string data;
+
+		textsecure::WebSocketResponseMessage *response = new textsecure::WebSocketResponseMessage;
+		response->set_id(id);
+		response->set_message(message);
+		response->set_status(200);
+
+		textsecure::WebSocketMessage wsmessage;
+		wsmessage.set_type(textsecure::WebSocketMessage::RESPONSE);
+		wsmessage.set_allocated_response(response);
+		wsmessage.SerializeToString(&data);
+
+		socket->send(data, true);
 	}
 };
 
@@ -43,48 +56,68 @@ struct OutgoingWebSocketRequest {
 };
 
 class WebSocketResource {
-
-	int m_socket;
+	Websocket *m_socket;
 	std::function<void(IncomingWebSocketRequest request)> handleRequest;
 
-	void onMessage() {
-		// Decode using protobuf to message
+	void onMessage(const std::string& data) {
+		textsecure::WebSocketMessage message;
+		message.ParseFromString(data);
 
-		// if (message.type === textsecure.protobuf.WebSocketMessage.Type.REQUEST ) {
-		handleRequest(IncomingWebSocketRequest(
-			"PUT",
-			//message.request.verb,
-			"/v1/address",
-			//message.request.path,
-			"",
-			//message.request.body,
-			7384653,
-			//message.request.id,
-			m_socket
-		));
-		// else
-		//     something else
-	}
+        if (message.type() == textsecure::WebSocketMessage::REQUEST) {
+            handleRequest(
+                IncomingWebSocketRequest(
+                    message.request().verb(),
+                    message.request().path(),
+                    message.request().body(),
+                    message.request().id(),
+                    m_socket
+                )
+            );
+        } else if (message.type() == textsecure::WebSocketMessage::RESPONSE) {
+        	puts("Someday not far from now this function will be shaped out of the ashes of the great, great and powerfull JS core");
+            // auto response = message.response();
+            // var request = outgoing[response.id()];
+            // if (request) {
+            //     request.response = response;
+            //     var callback = request.error;
+            //     if (response.status >= 200 && response.status < 300) {
+            //         callback = request.success;
+            //     }
+
+            //     if (typeof callback === 'function') {
+            //         callback(response.message, response.status(), request);
+            //     }
+            // } else {
+            //     throw 'Received response for unknown request ' + response.id();
+            // }
+        } else {
+        	SIGNAL_LOG_WARNING << "Invalid websocket request";
+        }
+	};
 
 	void onOpen() {
 		// Start keepalive timer
 	}
 
   public:
-  	WebSocketResource(int socket, std::function<void(IncomingWebSocketRequest request)> callback) : m_socket(socket), handleRequest(callback) {
-  		// Websocket is already active at this point
-  		
-  		onMessage();
-  		// Register lambda
-  		// Register Websocket hanlers
-  		// Register timer
+	WebSocketResource(Websocket *socket, std::function<void(IncomingWebSocketRequest request)> callback)
+	: m_socket(socket)
+	, handleRequest(callback) {
+
+		/* Call internal onMessage when hook is triggered */
+		socket->onMessage([this] (const std::string& data) {
+			this->onMessage(data);
+		});
+
+		socket->connect();
+		// Register timer
 	}
 
-  	void sendRequest() {
-  		// return new OutgoingWebSocketRequest(options, socket);
-  	}
+	void sendRequest() {
+		// return new OutgoingWebSocketRequest(options, socket);
+	}
 
-  	void close() {}
+	void close() {}
 };
 
 } // namespace signalpp
