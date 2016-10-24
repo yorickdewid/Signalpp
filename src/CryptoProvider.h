@@ -15,6 +15,8 @@ std::string HMAC(std::string& key, std::string& data);
 
 bool verifyMAC(std::string& data, std::string& key, std::string& mac, size_t length);
 
+std::string decrypt(const std::string& key, const std::string& ciphertext, const std::string& iv);
+
 } // namespace CryptoProvider
 
 } // namespace signalpp

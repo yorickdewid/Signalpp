@@ -1,12 +1,17 @@
 #include "Logger.h"
 #include "CryptoProvider.h"
 
+#include <openssl/aes.h>
 #include <openssl/evp.h>
 #include <openssl/hmac.h>
 #include <openssl/rand.h>
 #include <openssl/sha.h>
 
+#include <memory.h>
+
 using namespace signalpp;
+
+#define AES_KEY_LENGTH 32
 
 /*
  * Random byte generator
@@ -122,34 +127,29 @@ complete:
 /*
  * Symmetric encryptio/decryption routines
  */
-
 static const EVP_CIPHER *AESCipher(int cipher, size_t key_len) {
 	if (cipher == SG_CIPHER_AES_CBC_PKCS5) {
-		if(key_len == 16) {
+		if (key_len == 16) {
 			return EVP_aes_128_cbc();
-		}
-		else if(key_len == 24) {
+		} else if (key_len == 24) {
 			return EVP_aes_192_cbc();
-		}
-		else if(key_len == 32) {
+		} else if (key_len == 32) {
 			return EVP_aes_256_cbc();
 		}
-	}
-	else if(cipher == SG_CIPHER_AES_CTR_NOPADDING) {
-		if(key_len == 16) {
+	} else if (cipher == SG_CIPHER_AES_CTR_NOPADDING) {
+		if (key_len == 16) {
 			return EVP_aes_128_ctr();
-		}
-		else if(key_len == 24) {
+		} else if (key_len == 24) {
 			return EVP_aes_192_ctr();
-		}
-		else if(key_len == 32) {
+		} else if (key_len == 32) {
 			return EVP_aes_256_ctr();
 		}
 	}
+
 	return 0;
 }
 
-static int encrypt(signal_buffer **output,
+static int encrypt_raw(signal_buffer **output,
 		int cipher,
 		const uint8_t *key, size_t key_len,
 		const uint8_t *iv, size_t iv_len,
@@ -228,8 +228,8 @@ encrypt_complete:
 
 	return result;
 }
-
-static int decrypt(signal_buffer **output,
+ #include <openssl/err.h>
+static int decrypt_raw(signal_buffer **output,
 		int cipher,
 		const uint8_t *key, size_t key_len,
 		const uint8_t *iv, size_t iv_len,
@@ -265,7 +265,7 @@ static int decrypt(signal_buffer **output,
 			goto decrypt_complete;
 		}
 
-		if(cipher == SG_CIPHER_AES_CTR_NOPADDING) {
+		if (cipher == SG_CIPHER_AES_CTR_NOPADDING) {
 			result = EVP_CIPHER_CTX_set_padding(&ctx, 0);
 			if(!result) {
 				fprintf(stderr, "cannot set padding\n");
@@ -275,16 +275,15 @@ static int decrypt(signal_buffer **output,
 		}
 
 		out_buf = (uint8_t *)malloc(sizeof(uint8_t) * (ciphertext_len + EVP_CIPHER_block_size(evp_cipher)));
-		if(!out_buf) {
+		if (!out_buf) {
 			fprintf(stderr, "cannot allocate output buffer\n");
 			result = SG_ERR_UNKNOWN;
 			goto decrypt_complete;
 		}
 
 		int out_len = 0;
-		result = EVP_DecryptUpdate(&ctx,
-			out_buf, &out_len, ciphertext, ciphertext_len);
-		if(!result) {
+		result = EVP_DecryptUpdate(&ctx, out_buf, &out_len, ciphertext, ciphertext_len);
+		if (!result) {
 			fprintf(stderr, "cannot decrypt ciphertext\n");
 			result = SG_ERR_UNKNOWN;
 			goto decrypt_complete;
@@ -293,6 +292,8 @@ static int decrypt(signal_buffer **output,
 		int final_len = 0;
 		result = EVP_DecryptFinal_ex(&ctx, out_buf + out_len, &final_len);
 		if(!result) {
+			ERR_print_errors_fp(stderr);
+
 			fprintf(stderr, "cannot finish decrypting ciphertext\n");
 			result = SG_ERR_UNKNOWN;
 			goto decrypt_complete;
@@ -309,17 +310,39 @@ decrypt_complete:
 	return result;
 }
 
+unsigned char *aes_cbc_encrypt(unsigned char *key, unsigned char *iv, unsigned char *plaintext, size_t plaintext_len) {
+    AES_KEY encryption_key;
+
+    unsigned char *output = (unsigned char *)calloc(plaintext_len, sizeof(unsigned char));
+
+    AES_set_encrypt_key(key, AES_KEY_LENGTH * 8, &encryption_key);
+    AES_cbc_encrypt(plaintext, output, plaintext_len, &encryption_key, iv, AES_ENCRYPT);
+
+    return output;
+}
+
+unsigned char *aes_cbc_decrypt(unsigned char *key, unsigned char *iv, unsigned char *ciphertext, size_t ciphertext_len) {
+    AES_KEY decryption_key;
+    
+    unsigned char *output = (unsigned char *)calloc(ciphertext_len, sizeof(unsigned char));
+
+    AES_set_decrypt_key(key, AES_KEY_LENGTH * 8, &decryption_key);
+    AES_cbc_encrypt(ciphertext, output, ciphertext_len, &decryption_key, iv, AES_DECRYPT);
+
+    return output;
+}
+
 void CryptoProvider::hook(signal_context *context) {
 	signal_crypto_provider provider = {
-			.random_func = randomGenerator,
-			.hmac_sha256_init_func = HMAC_SHA256Init,
-			.hmac_sha256_update_func = HMAC_SHA256Update,
-			.hmac_sha256_final_func = HMAC_SHA256Final,
-			.hmac_sha256_cleanup_func = HMAC_SHA256Cleanup,
-			.sha512_digest_func = SHA512Digest,
-			.encrypt_func = encrypt,
-			.decrypt_func = decrypt,
-			.user_data = nullptr
+		.random_func = randomGenerator,
+		.hmac_sha256_init_func = HMAC_SHA256Init,
+		.hmac_sha256_update_func = HMAC_SHA256Update,
+		.hmac_sha256_final_func = HMAC_SHA256Final,
+		.hmac_sha256_cleanup_func = HMAC_SHA256Cleanup,
+		.sha512_digest_func = SHA512Digest,
+		.encrypt_func = encrypt_raw,
+		.decrypt_func = decrypt_raw,
+		.user_data = nullptr
 	};
 
 	signal_context_set_crypto_provider(context, &provider);
@@ -343,7 +366,6 @@ std::string CryptoProvider::HMAC(std::string& key, std::string& data) {
 		goto hmac_complete;
 	}
 
-	// result = signal_hmac_sha256_final(context, hmac_context, &output_buffer);
 	result = HMAC_SHA256Final(hmac_context, &output_buffer, user_data);
 	if (result < 0) {
 		goto hmac_complete;
@@ -379,4 +401,23 @@ bool CryptoProvider::verifyMAC(std::string& data, std::string& key, std::string&
 	}
 
 	return false;
+}
+
+std::string CryptoProvider::decrypt(const std::string& key, const std::string& ciphertext, const std::string& iv) {
+	unsigned char _key[AES_KEY_LENGTH];
+	unsigned char _iv[AES_BLOCK_SIZE];
+	unsigned char _ciphertext[128];
+
+	memcpy(_key, key.data(), AES_KEY_LENGTH);
+	memcpy(_iv, iv.data(), AES_BLOCK_SIZE);
+	memset(_ciphertext, '\0', 128);
+	memcpy(_ciphertext, ciphertext.data(), ciphertext.size());
+
+	unsigned char *dec = aes_cbc_decrypt(_key, _iv, _ciphertext, ciphertext.size());
+
+	std::string plaintext = std::string((const char *)dec, ciphertext.size());
+
+	free(dec);
+
+	return plaintext;
 }
