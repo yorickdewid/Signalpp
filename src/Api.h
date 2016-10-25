@@ -94,10 +94,10 @@ class TextSecureServer {
 	}
 
 	bool confirmCode(const std::string& number,
-						int code,
+						const std::string& code,
 						const std::string& password,
-						const std::string& signaling_key,
-						int registrationId,
+						std::string& signaling_key,
+						short registrationId,
 						const std::string& deviceName);
 
 	bool getDevices() {
@@ -118,7 +118,7 @@ class TextSecureServer {
 	void getAttachment() {}
 	void putAttachment() {}
 
-	std::string getMessageSocket();
+	Websocket *getMessageSocket();
 	Websocket *getProvisioningSocket();
 };
 

@@ -14,6 +14,24 @@ struct dataObject {
 	long sizeleft;
 };
 
+static size_t read_callback(void *ptr, size_t size, size_t nmemb, void *userdata) {
+	struct dataObject *writeback = (struct dataObject *)userdata;
+
+	if (size * nmemb < 1)
+		return 0;
+
+	if (writeback->sizeleft) {
+		// *(char *)ptr = writeback->readptr[0]; /* copy one single byte */ 
+		*(char *)ptr = writeback->readptr[0]; /* copy one single byte */
+		printf("%c", *(char *)ptr);
+		writeback->readptr++;                 /* advance pointer */ 
+		writeback->sizeleft--;                /* less data left */ 
+		return 1;                        /* we return 1 byte at a time! */ 
+	}
+
+	return 0;
+}
+
 //TODO: verification callback
 bool TextSecureServer::performCall(enum urlCall call, enum httpType type, const std::string& param, const std::string& data) {
 	CURL *curl;
@@ -31,8 +49,8 @@ bool TextSecureServer::performCall(enum urlCall call, enum httpType type, const 
 	SIGNAL_LOG_DEBUG << "Perform API call with:";
 	SIGNAL_LOG_DEBUG << "  url: " << url.str();
 	SIGNAL_LOG_DEBUG << "  type: " << type;
-	SIGNAL_LOG_DEBUG << "  data: (null)";
-	SIGNAL_LOG_DEBUG << "  contentType: application/json; charset=utf-8";
+	SIGNAL_LOG_DEBUG << "  data: " << data;
+	SIGNAL_LOG_DEBUG << "  Content-Type: application/json";
 	SIGNAL_LOG_DEBUG << "  user: " << m_username;
 	SIGNAL_LOG_DEBUG << "  password: " << m_password;
 
@@ -60,12 +78,15 @@ bool TextSecureServer::performCall(enum urlCall call, enum httpType type, const 
 
 		//TODO: data
 		if (!data.empty()) {
-			// struct dataObject writeback;
+			struct dataObject writeback;
 
-			// writeback.readptr = data;
-			// writeback.sizeleft = (long)strlen(data);
+			writeback.readptr = data.c_str();
+			writeback.sizeleft = (long)data.size();
+
+			curl_easy_setopt(curl, CURLOPT_READFUNCTION, read_callback);
+
 			/* pointer to pass to the read function */ 
-			// curl_easy_setopt(curl, CURLOPT_READDATA, &writeback);
+			curl_easy_setopt(curl, CURLOPT_READDATA, &writeback);
 		}
 
 #ifdef SKIP_PEER_VERIFICATION
@@ -77,7 +98,7 @@ bool TextSecureServer::performCall(enum urlCall call, enum httpType type, const 
 #endif
 		struct curl_slist *headers = nullptr;
 
-		headers = curl_slist_append(headers, "Content-Type: application/json; charset=utf-8");
+		headers = curl_slist_append(headers, "Content-Type: application/json");
 
 		/* Pass custom headers */
 		curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
@@ -92,8 +113,8 @@ bool TextSecureServer::performCall(enum urlCall call, enum httpType type, const 
 		}
 
 		/* Perform the request */ 
-		res = CURLE_OK;//curl_easy_perform(curl);
-		//res = curl_easy_perform(curl);
+		// res = CURLE_OK;
+		res = curl_easy_perform(curl);
 
 		/* Check for errors */ 
 		if (res != CURLE_OK) {
@@ -106,6 +127,9 @@ bool TextSecureServer::performCall(enum urlCall call, enum httpType type, const 
 
 		std::string message;
 		switch (code) {
+			case 200:
+				message = "Alreaiighhtt....";
+				break;
 			case -1:
 				message = "Failed to connect to the server, please check your network connection.";
 				break;
@@ -149,40 +173,36 @@ bool TextSecureServer::performCall(enum urlCall call, enum httpType type, const 
 }
 
 bool TextSecureServer::confirmCode(const std::string& number,
-									int code,
+									const std::string& code,
 									const std::string& password,
-									const std::string& signaling_key,
-									int registrationId,
+									std::string& signaling_key,
+									short registrationId,
 									const std::string& deviceName) {
-	/*var jsonData = {
-		signalingKey    : btoa(getString(signaling_key)),
-		supportsSms     : false,
-		fetchesMessages : true,
-		registrationId  : registrationId,
-	};
-
-	return this.ajax({
-		jsonData            : jsonData,
-	});*/
+	std::string jsonData = "{"
+		"\"signalingKey\":\"" + Base64::Encode(signaling_key) + "\","
+		"\"supportsSms\":false,"
+		"\"fetchesMessages\":true,"
+		"\"registrationId\":" + std::to_string(registrationId);
 
 	enum urlCall call;
 	std::string urlPrefix;
 
 	if (!deviceName.empty()) {
-		//jsonData.name = deviceName;
+		jsonData += ",\"name\":\"" + deviceName + "\"}";
 		call = DEVICES;
 		urlPrefix = "/";
 	} else {
+		jsonData += "}";
 		call = ACCOUNTS;
 		urlPrefix = "/code/";
 	}
 
 	m_username = number;
 	m_password = password;
-	return performCall(call, PUT, urlPrefix + std::to_string(code));
+	return performCall(call, PUT, urlPrefix + code, jsonData);
 }
 
-std::string TextSecureServer::getMessageSocket() {
+Websocket *TextSecureServer::getMessageSocket() {
 	std::string url = getUrl();
 
 	replace(url, "https://", "wss://");
@@ -192,7 +212,7 @@ std::string TextSecureServer::getMessageSocket() {
 
 	SIGNAL_LOG_DEBUG << "Websocket to " << url;
 
-	return url;//socket;
+	return new Websocket(url);
 }
 
 Websocket *TextSecureServer::getProvisioningSocket() {
