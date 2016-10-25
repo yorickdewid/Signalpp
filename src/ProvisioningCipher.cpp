@@ -92,10 +92,16 @@ ProvisionInfo ProvisioningCipher::decrypt(textsecure::ProvisionEnvelope& provisi
 	ec_public_key *public_key = nullptr;
 
 	int result = curve_decode_point(&public_key, (const uint8_t *)masterEphemeral.c_str(), masterEphemeral.size(), context);
-	//TODO: check printf("result 0? %d\n", result);
+	if (result) {
+		SIGNAL_LOG_ERROR << "Cannot decode private key";
+		return info; //TODO: throw
+	}
 
 	result = curve_calculate_agreement(&shared_secret, public_key, private_key);
-	//TODO: check printf("result 32? %d\n", result);
+	if (result != 32) {
+		SIGNAL_LOG_ERROR << "Agreement failed";
+		return info; //TODO: throw
+	}
 
 	/* Derive 3 keys */
     hkdf_context *hkdf_context;
@@ -106,7 +112,10 @@ ProvisionInfo ProvisioningCipher::decrypt(textsecure::ProvisionEnvelope& provisi
     char infoText[] = "TextSecure Provisioning Message";
 
     result = hkdf_create(&hkdf_context, 3, context);
-    //TODO: check printf("result 0? %d\n", result);
+    if (result) {
+		SIGNAL_LOG_ERROR << "Key derivation failed";
+		return info; //TODO: throw
+	}
 
     uint8_t *derived_keys = nullptr;
     result = hkdf_derive_secrets(hkdf_context, &derived_keys, //TODO: use cryptoprovider
@@ -114,7 +123,10 @@ ProvisionInfo ProvisioningCipher::decrypt(textsecure::ProvisionEnvelope& provisi
     	salt, 32,
     	(uint8_t *)infoText, 31,
     	96);
-    //TODO: check printf("result 96? %d\n", result);
+    if (result != 96) {
+		SIGNAL_LOG_ERROR << "Key derivation failed";
+		return info; //TODO: throw
+	}
 
     std::string derivedKeys = std::string((char *)derived_keys, 96);
     std::string key0 = derivedKeys.substr(0, 32);
