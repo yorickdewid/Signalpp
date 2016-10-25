@@ -17,6 +17,8 @@ bool verifyMAC(std::string& data, std::string& key, std::string& mac, size_t len
 
 std::string decrypt(const std::string& key, const std::string& ciphertext, const std::string& iv);
 
+char *getRandomBytes(size_t size);
+
 } // namespace CryptoProvider
 
 } // namespace signalpp

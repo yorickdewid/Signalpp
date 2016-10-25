@@ -7,18 +7,18 @@ namespace signalpp {
 
 namespace Registration {
 
-static void markDone(class StorageContainer& storage) {
+static void markDone(StorageContainer& storage) {
 	storage.put("RegistrationDoneEver", "1");
 	storage.put("RegistrationDone", "1");
 }
 
-static bool isDone(class StorageContainer& storage) {
+static bool isDone(StorageContainer& storage) {
 	// storage.get('RegistrationDone') === "1";
 	// check if RegistrationDone exists
 	return false;
 }
 
-static bool everDone(class StorageContainer& storage) {
+static bool everDone(StorageContainer& storage) {
     //return storage.get('chromiumRegistrationDoneEver') === '' ||
     //       storage.get('chromiumRegistrationDone') === '';
 
@@ -26,7 +26,7 @@ static bool everDone(class StorageContainer& storage) {
     return false;
 }
 
-static void remove(class StorageContainer& storage) {
+static void remove(StorageContainer& storage) {
 	//storage.purge('RegistrationDone');
 }
 

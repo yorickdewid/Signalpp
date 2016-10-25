@@ -12,7 +12,7 @@ void register_client() {
 	std::string username = storage.get("username");
 	std::string password = storage.get("password");
 
-	signalpp::AccountManager accountManager(signalpp::serverUrl, signalpp::serverPorts, username, password);
+	signalpp::AccountManager accountManager(&storage, signalpp::serverUrl, signalpp::serverPorts, username, password);
 
 	/* For the moment just show the URL */
 	auto provisionUrl = [] (const std::string& url) {

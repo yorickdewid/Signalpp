@@ -16,7 +16,6 @@ using namespace signalpp;
 /*
  * Random byte generator
  */
-
 static int randomGenerator(uint8_t *data, size_t len, void *user_data) {
 	if (RAND_bytes(data, len)) {
 		return 0;
@@ -420,4 +419,10 @@ std::string CryptoProvider::decrypt(const std::string& key, const std::string& c
 	free(dec);
 
 	return plaintext;
+}
+
+char *CryptoProvider::getRandomBytes(size_t size) {
+	uint8_t *data = (uint8_t *)malloc(size);
+	randomGenerator(data, size, nullptr);
+	return (char *)data;
 }
