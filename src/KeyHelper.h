@@ -38,6 +38,32 @@ public:
 		return key_pair;
 	}
 
+	ec_key_pair *generateSignedPreKey(signal_buffer **signature, ec_key_pair *identityKeyPair) {
+		ec_key_pair *key_pair;
+		signal_buffer *message;
+
+		int result = curve_generate_key_pair(context, &key_pair);
+		if (result) {
+			SIGNAL_LOG_ERROR << "curve_generate_key_pair() failed";
+			return nullptr; //TODO: throw
+		}
+
+		/* Use public key as message */
+		ec_public_key_serialize(&message, ec_key_pair_get_public(key_pair));
+
+		result = curve_calculate_signature(context, signature,
+			ec_key_pair_get_private(identityKeyPair),
+			signal_buffer_data(message), signal_buffer_len(message));
+		if (result) {
+			SIGNAL_LOG_ERROR << "curve_calculate_signature() failed";
+			return nullptr; //TODO: throw
+		}
+
+		signal_buffer_free(message);
+
+		return key_pair;
+	}
+
 };
 
 } // namespace signalpp
