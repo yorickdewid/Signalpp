@@ -2,6 +2,7 @@
 #define _ACCOUNT_MANAGER_H_
 
 #include "Api.h"
+#include "Storage.h"
 
 #include <signal_protocol.h>
 
@@ -12,13 +13,16 @@ namespace signalpp {
 
 class AccountManager {
 	std::unique_ptr<TextSecureServer> m_server;
+	StorageContainer *m_storage = nullptr;
 
 public:
-    AccountManager(const std::string& url,
+    AccountManager(class StorageContainer *storage,
+    					const std::string& url,
 						const unsigned short ports[],
 						const std::string& username,
 						const std::string& password)
-	: m_server(new TextSecureServer(url, username, password, ports)) {
+	: m_server(new TextSecureServer(url, username, password, ports))
+	, m_storage(storage) {
     }
 
 	inline void requestVoiceVerification(const std::string& number) {
@@ -42,7 +46,7 @@ public:
 									ec_key_pair *identityKeyPair,
 									const std::string& deviceName,
 									const std::string& userAgent);
-	void generateKeys() {}
+	void generateKeys(size_t count = 100);
 };
 
 } // namespace signalpp
