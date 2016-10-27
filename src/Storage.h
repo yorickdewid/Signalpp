@@ -15,8 +15,8 @@ class StorageContainer {
     /* Interfaces */
     virtual void put(const std::string& key, const std::string& value) = 0;
     virtual void put(const std::string& key, int value) = 0;
-    virtual void get(const std::string& key, std::string& value) = 0;
-    virtual void get(const std::string& key, int& value) = 0;
+    virtual bool get(const std::string& key, std::string& value) = 0;
+    virtual bool get(const std::string& key, int& value) = 0;
     virtual void purge(const std::string& key) = 0;
     virtual void close() = 0;
     virtual void flush() = 0;
@@ -53,16 +53,19 @@ class Ldb : public StorageContainer {
 		m_db->Put(leveldb::WriteOptions(), key, value);
 	}
 
-	void get(const std::string& key, std::string& value) {
-		m_db->Get(leveldb::ReadOptions(), key, &value);
+	bool get(const std::string& key, std::string& value) {
+		leveldb::Status status = m_db->Get(leveldb::ReadOptions(), key, &value);
+		return status.ok();
 	}
 
-	void get(const std::string& key, int& intValue) {
+	bool get(const std::string& key, int& intValue) {
 		std::string value;
 
-		m_db->Get(leveldb::ReadOptions(), key, &value);
+		leveldb::Status status = m_db->Get(leveldb::ReadOptions(), key, &value);
 
 		intValue = (uint8_t)value[3] << 24 | (uint8_t)value[2] << 16 | (uint8_t)value[1] << 8 | (uint8_t)value[0];
+
+		return status.ok();
 	}
 
 	void purge(const std::string& key) {
@@ -93,12 +96,12 @@ class Storage : public StorageContainer {
 		m_db->put(key, value);
 	}
 
-	inline void get(const std::string& key, std::string& value) {
-		m_db->get(key, value);
+	inline bool get(const std::string& key, std::string& value) {
+		return m_db->get(key, value);
 	}
 
-	inline void get(const std::string& key, int& value) {
-		m_db->get(key, value);
+	inline bool get(const std::string& key, int& value) {
+		return m_db->get(key, value);
 	}
 
 	inline std::string get(const std::string& key) {

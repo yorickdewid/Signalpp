@@ -9,23 +9,6 @@
 
 using namespace signalpp;
 
-void print_hex_public_key(ec_public_key *key) {
-	signal_buffer *buffer;
-	ec_public_key_serialize(&buffer, key);
-
-	uint8_t *data = signal_buffer_data(buffer);
-	int len = signal_buffer_len(buffer);
-	
-	SIGNAL_LOG_DEBUG << "Pubkkey: ";
-
-	int i;
-	for (i = 0; i < len; ++i) {
-		printf("%02x", data[i]);
-	}
-
-	signal_buffer_free(buffer);
-}
-
 std::string encodePublicKey(ec_public_key *key) {
 	signal_buffer *buffer;
 	ec_public_key_serialize(&buffer, key);
@@ -93,7 +76,7 @@ ProvisionInfo ProvisioningCipher::decrypt(textsecure::ProvisionEnvelope& provisi
 
 	int result = curve_decode_point(&public_key, (const uint8_t *)masterEphemeral.c_str(), masterEphemeral.size(), context);
 	if (result) {
-		SIGNAL_LOG_ERROR << "Cannot decode private key";
+		SIGNAL_LOG_ERROR << "Cannot decode public key";
 		return info; //TODO: throw
 	}
 
