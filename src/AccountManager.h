@@ -3,6 +3,7 @@
 
 #include "Api.h"
 #include "Storage.h"
+#include "PreKeyResult.h"
 
 #include <signal_protocol.h>
 
@@ -46,7 +47,7 @@ public:
 									ec_key_pair *identityKeyPair,
 									const std::string& deviceName,
 									const std::string& userAgent);
-	void generateKeys(size_t count = 100);
+	prekey::result generateKeys(size_t count = 100);
 };
 
 } // namespace signalpp

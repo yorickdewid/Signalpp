@@ -4,6 +4,7 @@
 #include "Logger.h"
 #include "Helper.h"
 #include "Websocket.h"
+#include "PreKeyResult.h"
 
 #include <vector>
 #include <string>
@@ -104,7 +105,8 @@ class TextSecureServer {
 		return performCall(DEVICES, GET);
 	}
 
-	void registerKeys() {}
+	void registerKeys(prekey::result& result);
+
 	void getMyKeys() {}
 	void getKeysForNumber() {}
 

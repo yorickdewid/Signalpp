@@ -7,7 +7,6 @@
 #include "Base64.h"
 
 #include <sstream>
-#include <vector>
 
 using namespace signalpp;
 
@@ -35,8 +34,8 @@ bool AccountManager::registerSecondDevice(std::function<void(const std::string&)
 			os << "tsdevice:/?uuid=";
 			os << provUuid.uuid();
 			os << "&pub_key=";
-			os << provisioningCipher.getPublicKey();
-			
+			os << KeyHelper::encodePublicKey(provisioningCipher.getPublicKey(), true);
+
 			/* Call provision hook */
 			setProvisioningUrl(os.str());
 
@@ -70,8 +69,8 @@ bool AccountManager::registerSecondDevice(std::function<void(const std::string&)
 
 	delete socket;
 
-	generateKeys();
-	m_server->registerKeys();
+	auto result = generateKeys();
+	m_server->registerKeys(result);
 	
 	return true;
 }
@@ -101,7 +100,9 @@ void AccountManager::createAccount(const std::string& number,
 	m_storage->purge("device_name");
 	m_storage->purge("userAgent");
 
-	// m_storage->put("identityKey");
+	KeyHelper::print_hex_key_pair(identityKeyPair);
+
+	m_storage->put("identityKey", KeyHelper::serializeKeyPair(identityKeyPair));
 	m_storage->put("signaling_key", signalingKey);
 	m_storage->put("password", password);
 	m_storage->put("registrationId", std::to_string(registrationId));
@@ -110,41 +111,33 @@ void AccountManager::createAccount(const std::string& number,
 	m_storage->put("userAgent", userAgent);
 }
 
-void AccountManager::generateKeys(size_t count) {
+prekey::result AccountManager::generateKeys(size_t count) {
 	SIGNAL_LOG_INFO << "Generate prekeys";
 
 	KeyHelper keyHelper;
 
-	unsigned int startId = 1;//textsecure.storage.get('maxPreKeyId', 1);
-	unsigned int signedKeyId = 1;//textsecure.storage.get('signedKeyId', 1);
+	unsigned int startId = 0;
+	unsigned int signedKeyId = 0;
 
-	// ec_key_pair *identityKey = m_storage->get("identityKey");
-	ec_key_pair *identityKey = keyHelper.generatePreKey();//MOCK
+	//TODO: rewrite
+	if (!m_storage->get("maxPreKeyId", (int&)startId) || !m_storage->get("signedKeyId", (int&)signedKeyId)) {
+		startId = 1;
+		signedKeyId = 1;
+	}
 
-	struct preKeyPair {
-		unsigned int keyId;
-		ec_public_key *publicKey;
-	};
+	std::string serialKey;
+	m_storage->get("identityKey", serialKey);
+	ec_key_pair *identityKey = KeyHelper::deserializeKeyPair(serialKey);
 
-	struct signedPreKey {
-		unsigned int keyId;
-		ec_public_key *publicKey;
-		signal_buffer *signature;
-	};
+	KeyHelper::print_hex_key_pair(identityKey);
 
-	struct result {
-		ec_key_pair *identityKey;
-		std::vector<preKeyPair> preKeys;
-		struct signedPreKey signedPreKey;
-	};
-
-	struct result result;
+	prekey::result result;
 
 	/* Generate prekeys */
 	for (unsigned int keyId = startId; keyId < startId + count; ++keyId) {
 		ec_key_pair *res = keyHelper.generatePreKey();
 		// // store.storePreKey(res.keyId, res.keyPair);//optional?
-		preKeyPair preKeyPair;
+		prekey::preKeyPair preKeyPair;
 		preKeyPair.keyId = keyId;
 		preKeyPair.publicKey = ec_key_pair_get_public(res);
 		result.preKeys.push_back(preKeyPair);
@@ -160,12 +153,12 @@ void AccountManager::generateKeys(size_t count) {
 	result.signedPreKey.publicKey = ec_key_pair_get_public(res);
 	result.signedPreKey.signature = signature;
 
-	/* Attatch to result */
-	result.identityKey = identityKey;
+	/* Attatch public identity key to result */
+	result.identityKey = ec_key_pair_get_public(identityKey);
 
 	// store.removeSignedPreKey(signedKeyId - 2);//NEIN
-	// m_storage->put("maxPreKeyId", startId + count);
-	// m_storage->put("signedKeyId", signedKeyId + 1);
-
-	// return result;
+	m_storage->put("maxPreKeyId", startId + count);
+	m_storage->put("signedKeyId", signedKeyId + 1);
+m_server->registerKeys(result);
+	return result;
 }

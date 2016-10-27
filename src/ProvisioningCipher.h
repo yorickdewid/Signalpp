@@ -23,7 +23,7 @@ class ProvisioningCipher {
   	~ProvisioningCipher();
 
 	ProvisionInfo decrypt(textsecure::ProvisionEnvelope& provisionEnvelope);
-	std::string getPublicKey();
+	ec_public_key *getPublicKey();
 };
 
 } // namespace signalpp

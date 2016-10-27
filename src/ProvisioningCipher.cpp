@@ -1,27 +1,14 @@
 #include "Logger.h"
 #include "Helper.h"
+#include "Base64.h"
 #include "CryptoProvider.h"
 #include "ProvisioningCipher.h"
-#include "Base64.h"
+#include "KeyHelper.h"
 #include "DeviceMessages.pb.h"
 
 #include <hkdf.h>
 
 using namespace signalpp;
-
-std::string encodePublicKey(ec_public_key *key) {
-	signal_buffer *buffer;
-	ec_public_key_serialize(&buffer, key);
-
-	uint8_t *data = signal_buffer_data(buffer);
-	int len = signal_buffer_len(buffer);
-
-	std::string out = Url::Encode(Base64::EncodeRaw((unsigned char const *)data, (unsigned int)len));
-
-	signal_buffer_free(buffer);
-
-	return out;
-}
 
 ProvisioningCipher::ProvisioningCipher() {
 	signal_context_create(&context, 0);//TODO: move
@@ -35,16 +22,14 @@ ProvisioningCipher::~ProvisioningCipher() {
 	signal_context_destroy(context);//TODO: move
 }
 
-std::string ProvisioningCipher::getPublicKey() {
+ec_public_key *ProvisioningCipher::getPublicKey() {
 	int result = curve_generate_key_pair(context, &key_pair);
 	if (result) {
 		SIGNAL_LOG_ERROR << "curve_generate_key_pair() failed";
 		return nullptr; //TODO: throw
 	}
 
-	ec_public_key *public_key = ec_key_pair_get_public(key_pair);
-
-	return encodePublicKey(public_key);
+	return ec_key_pair_get_public(key_pair);
 }
 
 ProvisionInfo ProvisioningCipher::decrypt(textsecure::ProvisionEnvelope& provisionEnvelope) {

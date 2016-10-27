@@ -1,5 +1,6 @@
 #include "Api.h"
 #include "Base64.h"
+#include "KeyHelper.h"
 
 #include <sstream>
 
@@ -128,7 +129,7 @@ bool TextSecureServer::performCall(enum urlCall call, enum httpType type, const 
 		std::string message;
 		switch (code) {
 			case 200:
-				message = "Alreaiighhtt....";
+				message = "Success.";
 				break;
 			case -1:
 				message = "Failed to connect to the server, please check your network connection.";
@@ -200,6 +201,44 @@ bool TextSecureServer::confirmCode(const std::string& number,
 	m_username = number;
 	m_password = password;
 	return performCall(call, PUT, urlPrefix + code, jsonData);
+}
+
+void TextSecureServer::registerKeys(prekey::result& result) {
+	std::string keys = "{"
+		"\"identityKey\":\"" + KeyHelper::encodePublicKey(result.identityKey) + "\",";
+
+	std::string signature = Base64::EncodeRaw(
+		signal_buffer_data(result.signedPreKey.signature),
+		signal_buffer_len(result.signedPreKey.signature));
+
+	keys += "\"signedPreKey\": {";
+	keys += "\"keyId\": " + std::to_string(result.signedPreKey.keyId) + ",";
+	keys += "\"publicKey\": \"" + KeyHelper::encodePublicKey(result.signedPreKey.publicKey) + "\",";
+	keys += "\"signature\": \"" + signature + "\"";
+	keys += "},";
+
+	keys += "\"preKeys\": [";
+
+	bool useComma = false;
+	for (const auto& preKeyPair : result.preKeys) {
+		if (useComma) {
+			keys += ", {";
+		} else {
+			keys += "{";
+			useComma = true;
+		}
+		keys += "\"keyId\": " + std::to_string(preKeyPair.keyId) + ",";
+		keys += "\"publicKey\": \"" + KeyHelper::encodePublicKey(preKeyPair.publicKey) + "\"";
+		keys += "}";
+	}
+
+	keys += "],";
+
+	keys += "\"lastResortKey\":{\"keyId\":2147483647,\"publicKey\":\"NDI=\"}";
+	keys += "}";
+
+	SIGNAL_LOG_DEBUG << keys;
+	// return performCall(KEYS, PUT, "/", jsonData);
 }
 
 Websocket *TextSecureServer::getMessageSocket() {
