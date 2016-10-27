@@ -12,3 +12,4 @@
 #include "../../src/ProvisioningCipher.h"
 #include "../../src/Api.h"
 #include "../../src/AccountManager.h"
+#include "../../src/MessageReceiver.h"
