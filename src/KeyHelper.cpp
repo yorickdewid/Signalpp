@@ -3,6 +3,8 @@
 #include "Base64.h"
 #include "KeyHelper.h"
 
+#define SERIALIZE_DELIMITER 	"$&&$"
+
 using namespace signalpp;
 
 const short KeyHelper::generateRegistrationId() {
@@ -19,7 +21,7 @@ std::string KeyHelper::serializeKeyPair(ec_key_pair *key_pair) {
 
 	std::string out;
 	out += std::string((const char *)signal_buffer_data(pub_buffer), signal_buffer_len(pub_buffer));
-	out += "$&&$";
+	out += SERIALIZE_DELIMITER;
 	out += std::string((const char *)signal_buffer_data(priv_buffer), signal_buffer_len(priv_buffer));
 
 	signal_buffer_free(pub_buffer);
@@ -33,7 +35,7 @@ ec_key_pair *KeyHelper::deserializeKeyPair(std::string& str) {
 	ec_public_key *public_key = nullptr;
 	ec_private_key *private_key = nullptr;
 
-	size_t div = str.find("$&&$");
+	size_t div = str.find(SERIALIZE_DELIMITER);
 
 	std::string pubkey = str.substr(0, div);
 	std::string privkey = str.substr(div + 4);

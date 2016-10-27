@@ -15,6 +15,11 @@ struct dataObject {
 	long sizeleft;
 };
 
+struct dataObjectWrite {
+	char *writeptr;
+	long size;
+};
+
 static size_t read_callback(void *ptr, size_t size, size_t nmemb, void *userdata) {
 	struct dataObject *writeback = (struct dataObject *)userdata;
 
@@ -22,22 +27,42 @@ static size_t read_callback(void *ptr, size_t size, size_t nmemb, void *userdata
 		return 0;
 
 	if (writeback->sizeleft) {
-		// *(char *)ptr = writeback->readptr[0]; /* copy one single byte */ 
-		*(char *)ptr = writeback->readptr[0]; /* copy one single byte */
+		*(char *)ptr = writeback->readptr[0];
 		printf("%c", *(char *)ptr);
-		writeback->readptr++;                 /* advance pointer */ 
-		writeback->sizeleft--;                /* less data left */ 
-		return 1;                        /* we return 1 byte at a time! */ 
+		writeback->readptr++;
+		writeback->sizeleft--;
+		return 1;
 	}
 
 	return 0;
 }
 
+static size_t write_callback(void *ptr, size_t size, size_t nmemb, void *userdata) {
+	size_t realsize = size * nmemb;
+	struct dataObjectWrite *mem = (struct dataObjectWrite *)userdata;
+
+	mem->writeptr = (char *)realloc(mem->writeptr, mem->size + realsize + 1);
+	if (!mem->writeptr) {
+		SIGNAL_LOG_DEBUG << "Memory allocation failed";
+		return 0;
+	}
+
+	memcpy(&(mem->writeptr[mem->size]), ptr, realsize);
+	mem->size += realsize;
+	mem->writeptr[mem->size] = '\0';
+
+	return realsize;
+}
+
 //TODO: verification callback
-bool TextSecureServer::performCall(enum urlCall call, enum httpType type, const std::string& param, const std::string& data) {
+std::string TextSecureServer::performCall(enum urlCall call, enum httpType type, const std::string& param, const std::string& data) {
 	CURL *curl;
 	CURLcode res;
+	struct dataObjectWrite writeback;
 	bool response = true;
+
+	writeback.writeptr = (char *)malloc(1);
+	writeback.size = 0;
 
 	std::ostringstream url;
 	url << m_url;
@@ -79,16 +104,22 @@ bool TextSecureServer::performCall(enum urlCall call, enum httpType type, const 
 
 		//TODO: data
 		if (!data.empty()) {
-			struct dataObject writeback;
+			struct dataObject readback;
 
-			writeback.readptr = data.c_str();
-			writeback.sizeleft = (long)data.size();
+			readback.readptr = data.c_str();
+			readback.sizeleft = (long)data.size();
 
 			curl_easy_setopt(curl, CURLOPT_READFUNCTION, read_callback);
 
-			/* pointer to pass to the read function */ 
-			curl_easy_setopt(curl, CURLOPT_READDATA, &writeback);
+			/* Pointer to pass to the read function */ 
+			curl_easy_setopt(curl, CURLOPT_READDATA, &readback);
 		}
+
+		/* Send all data to this function */ 
+		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
+
+		/* Pass struct to the callback function */ 
+		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &writeback);
 
 #ifdef SKIP_PEER_VERIFICATION
 		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
@@ -100,6 +131,7 @@ bool TextSecureServer::performCall(enum urlCall call, enum httpType type, const 
 		struct curl_slist *headers = nullptr;
 
 		headers = curl_slist_append(headers, "Content-Type: application/json");
+		headers = curl_slist_append(headers, "X-Signal-Agent: SNPP");
 
 		/* Pass custom headers */
 		curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
@@ -129,6 +161,7 @@ bool TextSecureServer::performCall(enum urlCall call, enum httpType type, const 
 		std::string message;
 		switch (code) {
 			case 200:
+			case 204:
 				message = "Success.";
 				break;
 			case -1:
@@ -144,6 +177,9 @@ bool TextSecureServer::performCall(enum urlCall call, enum httpType type, const 
 				//TODO: This shouldn't be a thing?, but its in the API doc?
 				message = "Number already registered.";
 				break;
+			case 418:
+				message = "Bring that teapot.";
+				break;
 			case 401:
 				message = "Invalid authentication, most likely someone re-registered and invalidated our registration.";
 				break;
@@ -157,8 +193,10 @@ bool TextSecureServer::performCall(enum urlCall call, enum httpType type, const 
 				message = "The server rejected our query, please file a bug report.";
 		}
 
+		if (writeback.size)
+			SIGNAL_LOG_DEBUG << writeback.writeptr;
 		SIGNAL_LOG_DEBUG << "Response code: " << code;
-		SIGNAL_LOG_ERROR << message;
+		SIGNAL_LOG_INFO << message;
 
 		curl_slist_free_all(headers); /* free the header list */
 
@@ -170,10 +208,14 @@ bool TextSecureServer::performCall(enum urlCall call, enum httpType type, const 
 
 	curl_global_cleanup();
 
-	return response;
+	if (!writeback.size || !response) {
+		return "";
+	}
+
+	return std::string(writeback.writeptr, writeback.size);
 }
 
-bool TextSecureServer::confirmCode(const std::string& number,
+int TextSecureServer::confirmCode(const std::string& number,
 									const std::string& code,
 									const std::string& password,
 									std::string& signaling_key,
@@ -200,7 +242,13 @@ bool TextSecureServer::confirmCode(const std::string& number,
 
 	m_username = number;
 	m_password = password;
-	return performCall(call, PUT, urlPrefix + code, jsonData);
+	std::string deviceId = performCall(call, PUT, urlPrefix + code, jsonData);
+	if (deviceId.empty()) {
+		return 0;
+	}
+
+	char idchar = deviceId[deviceId.find(":") + 1];
+	return (idchar - '0') % 48;  
 }
 
 void TextSecureServer::registerKeys(prekey::result& result) {
@@ -211,24 +259,24 @@ void TextSecureServer::registerKeys(prekey::result& result) {
 		signal_buffer_data(result.signedPreKey.signature),
 		signal_buffer_len(result.signedPreKey.signature));
 
-	keys += "\"signedPreKey\": {";
-	keys += "\"keyId\": " + std::to_string(result.signedPreKey.keyId) + ",";
-	keys += "\"publicKey\": \"" + KeyHelper::encodePublicKey(result.signedPreKey.publicKey) + "\",";
-	keys += "\"signature\": \"" + signature + "\"";
+	keys += "\"signedPreKey\":{";
+	keys += "\"keyId\":" + std::to_string(result.signedPreKey.keyId) + ",";
+	keys += "\"publicKey\":\"" + KeyHelper::encodePublicKey(result.signedPreKey.publicKey) + "\",";
+	keys += "\"signature\":\"" + signature + "\"";
 	keys += "},";
 
-	keys += "\"preKeys\": [";
+	keys += "\"preKeys\":[";
 
 	bool useComma = false;
 	for (const auto& preKeyPair : result.preKeys) {
 		if (useComma) {
-			keys += ", {";
+			keys += ",{";
 		} else {
 			keys += "{";
 			useComma = true;
 		}
-		keys += "\"keyId\": " + std::to_string(preKeyPair.keyId) + ",";
-		keys += "\"publicKey\": \"" + KeyHelper::encodePublicKey(preKeyPair.publicKey) + "\"";
+		keys += "\"keyId\":" + std::to_string(preKeyPair.keyId) + ",";
+		keys += "\"publicKey\":\"" + KeyHelper::encodePublicKey(preKeyPair.publicKey) + "\"";
 		keys += "}";
 	}
 
@@ -238,7 +286,7 @@ void TextSecureServer::registerKeys(prekey::result& result) {
 	keys += "}";
 
 	SIGNAL_LOG_DEBUG << keys;
-	// return performCall(KEYS, PUT, "/", jsonData);
+	performCall(KEYS, PUT, "", keys);
 }
 
 Websocket *TextSecureServer::getMessageSocket() {

@@ -90,7 +90,11 @@ void AccountManager::createAccount(const std::string& number,
 	SIGNAL_LOG_DEBUG << "Password: " << password;
 	SIGNAL_LOG_DEBUG << "registrationId: " << registrationId;
 
-	m_server->confirmCode(number, provisioningCode, password, signalingKey, registrationId, deviceName);
+	int deviceId = m_server->confirmCode(number, provisioningCode, password, signalingKey, registrationId, deviceName);
+	SIGNAL_LOG_DEBUG << "DeviceID: " << deviceId;
+
+	std::string number_id = number + "." + std::to_string(deviceId);
+	SIGNAL_LOG_DEBUG << "number_id: " << number_id;
 
 	m_storage->purge("identityKey");
 	m_storage->purge("signaling_key");
@@ -100,21 +104,22 @@ void AccountManager::createAccount(const std::string& number,
 	m_storage->purge("device_name");
 	m_storage->purge("userAgent");
 
-	KeyHelper::print_hex_key_pair(identityKeyPair);
-
 	m_storage->put("identityKey", KeyHelper::serializeKeyPair(identityKeyPair));
 	m_storage->put("signaling_key", signalingKey);
 	m_storage->put("password", password);
 	m_storage->put("registrationId", std::to_string(registrationId));
-	m_storage->put("number_id", number);
+	m_storage->put("number_id", number_id);
 	m_storage->put("device_name", deviceName);
 	m_storage->put("userAgent", userAgent);
+
+	m_server->setUsername(number_id);
 }
 
 prekey::result AccountManager::generateKeys(size_t count) {
 	SIGNAL_LOG_INFO << "Generate prekeys";
 
 	KeyHelper keyHelper;
+	prekey::result result;
 
 	unsigned int startId = 0;
 	unsigned int signedKeyId = 0;
@@ -128,10 +133,6 @@ prekey::result AccountManager::generateKeys(size_t count) {
 	std::string serialKey;
 	m_storage->get("identityKey", serialKey);
 	ec_key_pair *identityKey = KeyHelper::deserializeKeyPair(serialKey);
-
-	KeyHelper::print_hex_key_pair(identityKey);
-
-	prekey::result result;
 
 	/* Generate prekeys */
 	for (unsigned int keyId = startId; keyId < startId + count; ++keyId) {
@@ -159,6 +160,6 @@ prekey::result AccountManager::generateKeys(size_t count) {
 	// store.removeSignedPreKey(signedKeyId - 2);//NEIN
 	m_storage->put("maxPreKeyId", startId + count);
 	m_storage->put("signedKeyId", signedKeyId + 1);
-m_server->registerKeys(result);
+
 	return result;
 }

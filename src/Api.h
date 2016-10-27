@@ -52,7 +52,7 @@ class TextSecureServer {
 
 	std::map<enum urlCall, std::string> endpoint;
 	
-	bool performCall(enum urlCall call, enum httpType type, const std::string& param = "", const std::string& data = "");
+	std::string performCall(enum urlCall call, enum httpType type, const std::string& param = "", const std::string& data = "");
 
   public:
 	TextSecureServer(const std::string& url,
@@ -78,6 +78,10 @@ class TextSecureServer {
 		endpoint[ATTACHMENT] = "v1/attachments";
 	}
 
+	inline void setUsername(const std::string& username) {
+		m_username = username;
+	}
+
 	inline std::string getUrl() {
 		std::ostringstream os;
 		os << m_url;
@@ -87,14 +91,14 @@ class TextSecureServer {
 	}
 
 	inline bool requestVerificationSMS(const std::string& number) {
-		return performCall(ACCOUNTS, GET, "/sms/code/" + number);
+		return !performCall(ACCOUNTS, GET, "/sms/code/" + number).empty();
 	}
 
 	inline bool requestVerificationVoice(const std::string& number) {
-		return performCall(ACCOUNTS, GET, "/voice/code/" + number);
+		return !performCall(ACCOUNTS, GET, "/voice/code/" + number).empty();
 	}
 
-	bool confirmCode(const std::string& number,
+	int confirmCode(const std::string& number,
 						const std::string& code,
 						const std::string& password,
 						std::string& signaling_key,
@@ -102,7 +106,7 @@ class TextSecureServer {
 						const std::string& deviceName);
 
 	bool getDevices() {
-		return performCall(DEVICES, GET);
+		return !performCall(DEVICES, GET).empty();
 	}
 
 	void registerKeys(prekey::result& result);
@@ -114,7 +118,7 @@ class TextSecureServer {
 		// var jsonData = { messages: messageArray, timestamp: timestamp};
 
 		//TODO: pass jsonData as data
-		return performCall(MESSAGES, PUT, "/" + destination);
+		return !performCall(MESSAGES, PUT, "/" + destination).empty();
 	}
 
 	void getAttachment() {}

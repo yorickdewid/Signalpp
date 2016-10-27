@@ -37,7 +37,6 @@ public:
 
 	ec_key_pair *generatePreKey();
 	ec_key_pair *generateSignedPreKey(signal_buffer **signature, ec_key_pair *identityKeyPair);
-
 };
 
 } // namespace signalpp
