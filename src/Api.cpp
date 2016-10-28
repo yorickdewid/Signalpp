@@ -285,7 +285,6 @@ void TextSecureServer::registerKeys(prekey::result& result) {
 	keys += "\"lastResortKey\":{\"keyId\":2147483647,\"publicKey\":\"NDI=\"}";
 	keys += "}";
 
-	SIGNAL_LOG_DEBUG << keys;
 	performCall(KEYS, PUT, "", keys);
 }
 

@@ -128,11 +128,8 @@ prekey::result AccountManager::generateKeys(size_t count) {
 	unsigned int startId = 0;
 	unsigned int signedKeyId = 0;
 
-	//TODO: rewrite and prefill database
-	if (!m_storage->get("maxPreKeyId", (int&)startId) || !m_storage->get("signedKeyId", (int&)signedKeyId)) {
-		startId = 1;
-		signedKeyId = 1;
-	}
+	m_storage->get("maxPreKeyId", (int&)startId);
+	m_storage->get("signedKeyId", (int&)signedKeyId);
 
 	std::string serialKey;
 	m_storage->get("identityKey", serialKey);

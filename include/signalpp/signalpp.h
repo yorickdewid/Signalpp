@@ -3,6 +3,7 @@
  */
 
 /* Header files for local reference */
+#include "../../src/Env.h"
 #include "../../src/Config.h"
 #include "../../src/Error.h"
 #include "../../src/Logger.h"
