@@ -100,16 +100,20 @@ void AccountManager::createAccount(const std::string& number,
 	m_storage->purge("signaling_key");
 	m_storage->purge("password");
 	m_storage->purge("registrationId");
+	m_storage->purge("number");
 	m_storage->purge("number_id");
 	m_storage->purge("device_name");
+	m_storage->purge("device_id");
 	m_storage->purge("userAgent");
 
 	m_storage->put("identityKey", KeyHelper::serializeKeyPair(identityKeyPair));
 	m_storage->put("signaling_key", signalingKey);
 	m_storage->put("password", password);
 	m_storage->put("registrationId", std::to_string(registrationId));
+	m_storage->put("number", number);
 	m_storage->put("number_id", number_id);
 	m_storage->put("device_name", deviceName);
+	m_storage->put("device_id", deviceId);
 	m_storage->put("userAgent", userAgent);
 
 	m_server->setUsername(number_id);
@@ -124,7 +128,7 @@ prekey::result AccountManager::generateKeys(size_t count) {
 	unsigned int startId = 0;
 	unsigned int signedKeyId = 0;
 
-	//TODO: rewrite
+	//TODO: rewrite and prefill database
 	if (!m_storage->get("maxPreKeyId", (int&)startId) || !m_storage->get("signedKeyId", (int&)signedKeyId)) {
 		startId = 1;
 		signedKeyId = 1;

@@ -6,7 +6,68 @@
 
 #include <signalpp/signalpp.h>
 
+#define CLIENT_NAME		"SignalClient++"
+
 signalpp::Storage<signalpp::Ldb> storage;
+bool firstRun = false;
+
+void init(bool firstRun = false) {
+	if (!signalpp::Registration::isDone(storage)) {
+		return;
+	}
+
+	SIGNAL_LOG_INFO << "Starting init";
+
+	// if (messageReceiver) {
+	// 	messageReceiver.close();
+	// }
+
+	std::string username = storage.get("number_id");
+	std::string password = storage.get("password");
+	std::string signalingKey = storage.get("signaling_key");
+
+	/* Initialize the socket and start listening for messages */
+	signalpp::MessageReceiver messageReceiver(&storage,
+		signalpp::serverUrl,
+		signalpp::serverPorts,
+		username, password, signalingKey,
+		signalpp::attachmentServerUrl);
+
+	// messageReceiver.onMmessage(onMessageReceived);
+	// messageReceiver.onReceipt(onDeliveryReceipt);
+	// messageReceiver.onContact(onContactReceived);
+	// messageReceiver.onGroup(onGroupReceived);
+	// messageReceiver.onSent(onSentMessage);
+	// messageReceiver.onRead(onReadReceipt);
+	// messageReceiver.onError(onError);
+
+	// signalpp::MessageSender messageSender(&storage,
+	//	signalpp::serverUrl,
+	//	signalpp::serverPorts,
+	//	username, password, signalingKey,
+	//	signalpp::attachmentServerUrl);
+
+	if (firstRun) {
+		int device_id = 0;
+		if (!storage.get("device_id", device_id))
+			return;
+		if (!device_id || device_id == 1)
+			return;
+
+	// 	SyncRequest syncRequest(messageSender, messageReceiver);
+		
+	//	syncRequest.onSuccess([] () {
+	//		SIGNAL_LOG_INFO << "Sync successful";
+	// 		storage.put("synced_at", Date.now());
+	// 		window.dispatchEvent(new Event('textsecure:contactsync'));
+	//	});
+
+	//	syncRequest.onTimeout([] () {
+	//		SIGNAL_LOG_INFO << "Sync timed out";
+	// 		window.dispatchEvent(new Event('textsecure:contactsync'));
+	//	});
+	}
+}
 
 void register_client() {
 	std::string username = storage.get("username");
@@ -22,14 +83,14 @@ void register_client() {
 	/* For the moment just show the URL */
 	auto confirmNumber = [] (const std::string& number) -> std::string {
 		SIGNAL_LOG_INFO << "Number: " << number;
-		return "Signal++";
+		return CLIENT_NAME;
 	};
 
 	if (accountManager.registerSecondDevice(provisionUrl, confirmNumber)) {
 		signalpp::Registration::markDone(storage);
 	}
 
-	// textsecure:contactsync
+	firstRun = true;
 }
 
 void usage(const char *prog) {
@@ -89,11 +150,13 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
+	/* Register client if this first run */
 	if (!signalpp::Registration::everDone(storage)) {
 		register_client();
 	}
 
-	// openInbox();
+	/* Initialize the client */
+	init(firstRun);
 
 	return 0;
 }
