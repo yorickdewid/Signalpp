@@ -4,6 +4,7 @@
 #include "Config.h"
 
 #include <iomanip>
+#include <ctime>
 #include <unistd.h>
 
 namespace signalpp {
@@ -30,29 +31,33 @@ static bool replace(std::string& str, const std::string& from, const std::string
 	return true;
 }
 
+static long int getTimestamp() {
+	return static_cast<long int>(time(NULL));
+}
+
 namespace Url {
 
 static std::string Encode(const std::string &value) {
-    std::ostringstream escaped;
-    escaped.fill('0');
-    escaped << std::hex;
+	std::ostringstream escaped;
+	escaped.fill('0');
+	escaped << std::hex;
 
-    for (std::string::const_iterator i = value.begin(), n = value.end(); i != n; ++i) {
-        std::string::value_type c = (*i);
+	for (std::string::const_iterator i = value.begin(), n = value.end(); i != n; ++i) {
+		std::string::value_type c = (*i);
 
-        /* Keep alphanumeric and other accepted characters intact */
-        if (isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~') {
-            escaped << c;
-            continue;
-        }
+		/* Keep alphanumeric and other accepted characters intact */
+		if (isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~') {
+			escaped << c;
+			continue;
+		}
 
-        /* Any other characters are percent-encoded */
-        escaped << std::uppercase;
-        escaped << '%' << std::setw(2) << int((unsigned char) c);
-        escaped << std::nouppercase;
-    }
+		/* Any other characters are percent-encoded */
+		escaped << std::uppercase;
+		escaped << '%' << std::setw(2) << int((unsigned char) c);
+		escaped << std::nouppercase;
+	}
 
-    return escaped.str();
+	return escaped.str();
 }
 
 } // Url

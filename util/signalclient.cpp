@@ -33,6 +33,7 @@ void init(bool firstRun = false) {
 		username, password, signalingKey,
 		signalpp::attachmentServerUrl);
 
+	// bind:
 	// messageReceiver.onMmessage(onMessageReceived);
 	// messageReceiver.onReceipt(onDeliveryReceipt);
 	// messageReceiver.onContact(onContactReceived);
@@ -58,7 +59,7 @@ void init(bool firstRun = false) {
 		
 	//	syncRequest.onSuccess([] () {
 	//		SIGNAL_LOG_INFO << "Sync successful";
-	// 		storage.put("synced_at", Date.now());
+	// 		storage.put("synced_at", signalpp::getTimestamp());
 	// 		window.dispatchEvent(new Event('textsecure:contactsync'));
 	//	});
 
