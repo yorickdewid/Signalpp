@@ -14,3 +14,5 @@
 #include "../../src/Api.h"
 #include "../../src/AccountManager.h"
 #include "../../src/MessageReceiver.h"
+#include "../../src/MessageSender.h"
+#include "../../src/SyncRequest.h"

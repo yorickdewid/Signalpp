@@ -6,6 +6,8 @@
 
 #include <signal_protocol.h>
 
+#include <functional>
+
 namespace signalpp {
 
 class MessageReceiver {
@@ -35,6 +37,14 @@ public:
 		// this.deviceId = address.getDeviceId();
 		connect();
 	}
+
+	void onMmessage(std::function<void()> callback) {}
+	void onReceipt(std::function<void()> callback) {}
+	void onContact(std::function<void()> callback) {}
+	void onGroup(std::function<void()> callback) {}
+	void onSent(std::function<void()> callback) {}
+	void onRead(std::function<void()> callback) {}
+	void onError(std::function<void()> callback) {}
 
 	~MessageReceiver() {
 		delete m_socket;

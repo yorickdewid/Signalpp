@@ -290,9 +290,7 @@ static int decrypt_raw(signal_buffer **output,
 
 		int final_len = 0;
 		result = EVP_DecryptFinal_ex(&ctx, out_buf + out_len, &final_len);
-		if(!result) {
-			ERR_print_errors_fp(stderr);
-
+		if (!result) {
 			fprintf(stderr, "cannot finish decrypting ciphertext\n");
 			result = SG_ERR_UNKNOWN;
 			goto decrypt_complete;

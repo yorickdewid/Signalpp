@@ -30,7 +30,7 @@ struct IncomingWebSocketRequest {
 		SIGNAL_LOG_DEBUG << "IncomingWebSocketRequest:";
 		SIGNAL_LOG_DEBUG << " verb: " << verb;
 		SIGNAL_LOG_DEBUG << " path: " << path;
-		SIGNAL_LOG_DEBUG << " pathSz: " << body.size();
+		SIGNAL_LOG_DEBUG << " body sz: " << body.size();
 		SIGNAL_LOG_DEBUG << " id: " << id;
 	}
 

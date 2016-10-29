@@ -32,20 +32,20 @@ void init(bool firstRun = false) {
 		username, password, signalingKey,
 		signalpp::attachmentServerUrl);
 
-	// bind:
-	// messageReceiver.onMmessage(onMessageReceived);
-	// messageReceiver.onReceipt(onDeliveryReceipt);
-	// messageReceiver.onContact(onContactReceived);
-	// messageReceiver.onGroup(onGroupReceived);
-	// messageReceiver.onSent(onSentMessage);
-	// messageReceiver.onRead(onReadReceipt);
-	// messageReceiver.onError(onError);
+	/* Actions on incomming messages */
+	messageReceiver.onMmessage([]{});
+	messageReceiver.onReceipt([]{});
+	messageReceiver.onContact([]{});
+	messageReceiver.onGroup([]{});
+	messageReceiver.onSent([]{});
+	messageReceiver.onRead([]{});
+	messageReceiver.onError([]{});
 
-	// signalpp::MessageSender messageSender(&storage,
-	//	signalpp::serverUrl,
-	//	signalpp::serverPorts,
-	//	username, password, signalingKey,
-	//	signalpp::attachmentServerUrl);
+	signalpp::MessageSender messageSender(&storage,
+		signalpp::serverUrl,
+		signalpp::serverPorts,
+		username, password, signalingKey,
+		signalpp::attachmentServerUrl);
 
 	if (firstRun) {
 		int device_id = 0;
@@ -54,18 +54,20 @@ void init(bool firstRun = false) {
 		if (!device_id || device_id == 1)
 			return;
 
-	// 	SyncRequest syncRequest(messageSender, messageReceiver);
-		
-	//	syncRequest.onSuccess([] () {
-	//		SIGNAL_LOG_INFO << "Sync successful";
-	// 		storage.put("synced_at", signalpp::getTimestamp());
-	// 		window.dispatchEvent(new Event('textsecure:contactsync'));
-	//	});
+		SIGNAL_LOG_INFO << "First run";
 
-	//	syncRequest.onTimeout([] () {
-	//		SIGNAL_LOG_INFO << "Sync timed out";
-	// 		window.dispatchEvent(new Event('textsecure:contactsync'));
-	//	});
+		signalpp::SyncRequest syncRequest(messageSender, messageReceiver);
+		
+		syncRequest.onSuccess([&syncRequest] () {
+			SIGNAL_LOG_INFO << "Sync successful";
+			storage.put("synced_at", signalpp::getTimestamp());
+			syncRequest.onContactSyncComplete();
+		});
+
+		syncRequest.onTimeout([&syncRequest] () {
+			SIGNAL_LOG_INFO << "Sync timed out";
+			syncRequest.onContactSyncComplete();
+		});
 	}
 }
 
