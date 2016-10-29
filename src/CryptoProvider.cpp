@@ -227,7 +227,7 @@ encrypt_complete:
 
 	return result;
 }
- #include <openssl/err.h>
+
 static int decrypt_raw(signal_buffer **output,
 		int cipher,
 		const uint8_t *key, size_t key_len,
@@ -308,6 +308,10 @@ decrypt_complete:
 	}
 	return result;
 }
+
+/* 
+ * Autopadding operations
+ */
 
 unsigned char *aes_cbc_encrypt(unsigned char *key, unsigned char *iv, unsigned char *plaintext, size_t plaintext_len) {
     AES_KEY encryption_key;

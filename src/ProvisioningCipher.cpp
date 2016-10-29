@@ -72,40 +72,40 @@ ProvisionInfo ProvisioningCipher::decrypt(textsecure::ProvisionEnvelope& provisi
 	}
 
 	/* Derive 3 keys */
-    hkdf_context *hkdf_context;
+	hkdf_context *hkdf_context;
 
-    uint8_t salt[32];
-    memset(salt, '\0', 32);
+	uint8_t salt[32];
+	memset(salt, '\0', 32);
 
-    char infoText[] = "TextSecure Provisioning Message";
+	char infoText[] = "TextSecure Provisioning Message";
 
-    result = hkdf_create(&hkdf_context, 3, context);
-    if (result) {
+	result = hkdf_create(&hkdf_context, 3, context);
+	if (result) {
 		SIGNAL_LOG_ERROR << "Key derivation failed";
 		return info; //TODO: throw
 	}
 
-    uint8_t *derived_keys = nullptr;
-    result = hkdf_derive_secrets(hkdf_context, &derived_keys, //TODO: use cryptoprovider
-    	shared_secret, 32,
-    	salt, 32,
-    	(uint8_t *)infoText, 31,
-    	96);
-    if (result != 96) {
+	uint8_t *derived_keys = nullptr;
+	result = hkdf_derive_secrets(hkdf_context, &derived_keys, //TODO: use cryptoprovider
+		shared_secret, 32,
+		salt, 32,
+		(uint8_t *)infoText, 31,
+		96);
+	if (result != 96) {
 		SIGNAL_LOG_ERROR << "Key derivation failed";
 		return info; //TODO: throw
 	}
 
-    std::string derivedKeys = std::string((char *)derived_keys, 96);
-    std::string key0 = derivedKeys.substr(0, 32);
-    std::string key1 = derivedKeys.substr(32, 32);
-    std::string key2 = derivedKeys.substr(64, 32);
+	std::string derivedKeys = std::string((char *)derived_keys, 96);
+	std::string key0 = derivedKeys.substr(0, 32);
+	std::string key1 = derivedKeys.substr(32, 32);
+	std::string key2 = derivedKeys.substr(64, 32);
 
-    SIGNAL_LOG_DEBUG << "key0: " << Base64::Encode(key0);
-    SIGNAL_LOG_DEBUG << "key1: " << Base64::Encode(key1);
-    SIGNAL_LOG_DEBUG << "key2: " << Base64::Encode(key2);
+	SIGNAL_LOG_DEBUG << "key0: " << Base64::Encode(key0);
+	SIGNAL_LOG_DEBUG << "key1: " << Base64::Encode(key1);
+	SIGNAL_LOG_DEBUG << "key2: " << Base64::Encode(key2);
 
-    /* Verify MAC and decrypt */
+	/* Verify MAC and decrypt */
 	if (CryptoProvider::verifyMAC(ivAndCiphertext, key1, mac, 32)) {
 		std::string plaintext = CryptoProvider::decrypt(key0, ciphertext, iv);
 
@@ -137,10 +137,10 @@ ProvisionInfo ProvisioningCipher::decrypt(textsecure::ProvisionEnvelope& provisi
 
 	SIGNAL_LOG_ERROR << "Message verification failed";
 
-    // if (derived_keys) {
-    // 	free(derived_keys);
-   	// }
-    // SIGNAL_UNREF(hkdf_context);
+	// if (derived_keys) {
+	// 	free(derived_keys);
+	// }
+	// SIGNAL_UNREF(hkdf_context);
 //
 
 	return info;
