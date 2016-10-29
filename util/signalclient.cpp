@@ -18,13 +18,12 @@ void init(bool firstRun = false) {
 
 	SIGNAL_LOG_INFO << "Starting init";
 
-	// if (messageReceiver) {
-	// 	messageReceiver.close();
-	// }
-
 	std::string username = storage.get("number_id");
 	std::string password = storage.get("password");
 	std::string signalingKey = storage.get("signaling_key");
+
+	SIGNAL_LOG_DEBUG << "username: " << username;
+	SIGNAL_LOG_DEBUG << "password: " << password;
 
 	/* Initialize the socket and start listening for messages */
 	signalpp::MessageReceiver messageReceiver(&storage,
@@ -102,6 +101,7 @@ void usage(const char *prog) {
 	printf(" -p  --profile          Show current profile\n");
 	printf("     --sms NUMBER       Send an SMS verification code\n");
 	printf("     --voice NUMBER     Send voice verification code\n");
+	printf("     --purge            Purge current client data\n");
 	printf(" -V  --verbose          More verbose output\n");
 	printf(" -v  --version          Library version and quit\n");
 }
@@ -114,6 +114,7 @@ int main(int argc, char *argv[]) {
 		{"profile",        no_argument,       0,  'p' },
 		{"sms",            required_argument, 0,  'S' },
 		{"voice",          required_argument, 0,  'O' },
+		{"purge",          no_argument,       0,  'P' },
 		{"secure",         no_argument,       0,  's' },
 		{"verbose",        no_argument,       0,  'V' },
 		{"help",           no_argument,       0,  'h' },
@@ -133,6 +134,9 @@ int main(int argc, char *argv[]) {
 				break;
 			case 'O' :
 				// optarg
+				break;
+			case 'P' :
+				signalpp::Env::purge(storage);
 				break;
 			case 's' :
 				break;

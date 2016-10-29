@@ -1,9 +1,10 @@
 #ifndef _STORAGE_H_
 #define _STORAGE_H_
 
-#include <memory>
-
 #include <leveldb/db.h>
+
+#include <memory>
+#include <iostream>
 
 #define DEFAULT_NAME "indexdb"
 

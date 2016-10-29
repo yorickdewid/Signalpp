@@ -294,7 +294,7 @@ Websocket *TextSecureServer::getMessageSocket() {
 	replace(url, "https://", "wss://");
 	replace(url, "http://", "ws://");
 
-	url += "/v1/websocket/?login=" + Base64::Encode(m_username) + "&password=" + Base64::Encode(m_password) + "&agent=OWD";
+	url += "/v1/websocket/?login=" + Url::Encode(m_username) + "&password=" + Url::Encode(m_password) + "&agent=OWD";
 
 	SIGNAL_LOG_DEBUG << "Websocket to " << url;
 

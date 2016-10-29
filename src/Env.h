@@ -33,6 +33,20 @@ public:
 	: m_storage(storage) {
 		init();
 	}
+
+	static void purge(class StorageContainer& storage) {
+		signalpp::Registration::remove(storage);
+
+		storage.purge("identityKey");
+		storage.purge("signaling_key");
+		storage.purge("password");
+		storage.purge("registrationId");
+		storage.purge("number");
+		storage.purge("number_id");
+		storage.purge("device_name");
+		storage.purge("device_id");
+		storage.purge("userAgent");
+	}
 };
 
 } // namespace signalpp

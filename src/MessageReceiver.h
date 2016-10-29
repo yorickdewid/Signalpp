@@ -1,6 +1,7 @@
 #ifndef _MESSAGE_RECEIVER_H_
 #define _MESSAGE_RECEIVER_H_
 
+#include "Api.h"
 #include "Storage.h"
 
 #include <signal_protocol.h>
@@ -10,28 +11,9 @@ namespace signalpp {
 class MessageReceiver {
 	std::unique_ptr<TextSecureServer> m_server;
 	StorageContainer *m_storage = nullptr;
+	Websocket *m_socket = nullptr;
 
-	void connect() {
-		// if (this.socket && this.socket.readyState !== WebSocket.CLOSED) {
-		// 	this.socket.close();
-		// }
-
-		SIGNAL_LOG_INFO << "Opening websocket";
-
-		/* Initialize the socket and start listening for messages */
-		auto socket = m_server->getMessageSocket();
-		
-		// this.socket.onclose = this.onclose.bind(this);
-		// this.socket.onerror = this.onerror.bind(this);
-		// this.socket.onopen = this.onopen.bind(this);
-		// this.wsr = new WebSocketResource(this.socket, {
-		// 	handleRequest: this.handleRequest.bind(this),
-		// 	keepalive: { path: '/v1/keepalive', disconnect: true }
-		// });
-		// this.pending = Promise.resolve();
-
-		delete socket;
-	}
+	void connect();
 
 public:
 	MessageReceiver(class StorageContainer *storage,
@@ -51,6 +33,11 @@ public:
 		// var address = libsignal.SignalProtocolAddress.fromString(username);
 		// this.number = address.getName();
 		// this.deviceId = address.getDeviceId();
+		connect();
+	}
+
+	~MessageReceiver() {
+		delete m_socket;
 	}
 };
 
