@@ -5,6 +5,7 @@
 #include "Helper.h"
 #include "Websocket.h"
 #include "PreKeyResult.h"
+#include "Json.h"
 
 #include <vector>
 #include <string>
@@ -112,7 +113,7 @@ class TextSecureServer {
 	void registerKeys(prekey::result& result);
 
 	void getMyKeys() {}
-	void getKeysForNumber() {}
+	nlohmann::json getKeysForNumber(std::string& number, int deviceId = 0);
 
 	bool sendMessages(const std::string& destination, char *messageArray, int timestamp) {
 		// var jsonData = { messages: messageArray, timestamp: timestamp};

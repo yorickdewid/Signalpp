@@ -10,6 +10,8 @@
 
 using namespace signalpp;
 
+using json = nlohmann::json;
+
 struct dataObject {
 	const char *readptr;
 	long sizeleft;
@@ -286,6 +288,36 @@ void TextSecureServer::registerKeys(prekey::result& result) {
 	keys += "}";
 
 	performCall(KEYS, PUT, "", keys);
+}
+
+json TextSecureServer::getKeysForNumber(std::string& number, int deviceId) {
+	std::string uri = "/" + number + "/" + std::to_string(deviceId);
+	if (!deviceId)
+		std::string uri = "/" + number + "/*";
+
+	// auto res = json::parse(performCall(KEYS, GET, uri));
+	auto res = R"({"identityKey":"BTFwfbnoMaimVLHznxWKDTruswF/FKAOKi3qDVai3UJr","devices":[{"deviceId":1,"registrationId":6922,"signedPreKey":{"keyId":8731799,"publicKey":"BUnRGYXIT+MQ1P5NaoDWgG4FtxEbB5/MEMJ6ME5qLKUJ","signature":"wogO8wlAbDvrSW6SpZwjdig8edd6gfNsEYSeAO+4rOlUsqApCmwyA/30mp1AL8wVcDpRX53tbNaTuA+N2VjbgA"},"preKey":{"keyId":12731962,"publicKey":"BQUzo4DmbT7uYDNhC+MY3KSTbqLT9pP+zsSxwVmrJdkT"}}]})"_json;
+	if (!res["devices"].is_array()) {
+		SIGNAL_LOG_ERROR << "Invalid response";
+	}
+
+	SIGNAL_LOG_INFO << res["identityKey"].get<std::string>();
+
+	res["identityKey"] = Base64::Decode(res["identityKey"].get<std::string>());
+
+	SIGNAL_LOG_INFO << "identityKey size " << res["identityKey"].get<std::string>().size();
+
+	for (auto& device : res["devices"]) {
+		SIGNAL_LOG_INFO << "signedPreKey publicKey " << device["signedPreKey"]["publicKey"];
+		SIGNAL_LOG_INFO << "signedPreKey signature " << device["signedPreKey"]["signature"];
+		SIGNAL_LOG_INFO << "preKey publicKey " << device["preKey"]["publicKey"];
+
+		device["signedPreKey"]["publicKey"] = Base64::Decode(device["signedPreKey"]["publicKey"]);
+		device["signedPreKey"]["signature"] = Base64::Decode(device["signedPreKey"]["signature"]);
+		device["preKey"]["publicKey"] = Base64::Decode(device["preKey"]["publicKey"]);
+	}
+
+	return res;
 }
 
 Websocket *TextSecureServer::getMessageSocket() {

@@ -3,16 +3,17 @@
 
 #include "Api.h"
 #include "Storage.h"
+#include "OutgoingMessage.h"
+
+#include "IncomingPushMessageSignal.pb.h"
 
 #include <signal_protocol.h>
 
 namespace signalpp {
 
 class MessageSender {
-	std::unique_ptr<TextSecureServer> m_server;
+	std::shared_ptr<TextSecureServer> m_server;
 	StorageContainer *m_storage = nullptr;
-
-	void connect();
 
 public:
 	MessageSender(class StorageContainer *storage,
@@ -34,15 +35,27 @@ public:
 		// this.deviceId = address.getDeviceId();
 	}
 
-	void sendIndividualProto(std::string& number, void *proto, long int timestamp) {
-		// return new Promise(function(resolve, reject) {
-		// 	this.sendMessageProto(timestamp, [number], proto, function(res) {
-		// 		if (res.errors.length > 0)
-		// 			reject(res);
-		// 		else
-		// 			resolve(res);
-		// 	});
-		// }.bind(this));
+	void sendMessageProto(long int timestamp, std::vector<std::string>& numbers, textsecure::Content& message, std::function<void()> callback) {
+		std::string data;
+		message.SerializeToString(&data);
+
+		auto outgoing = new OutgoingMessage(m_server, timestamp, numbers, data, callback);
+
+		for (std::string& number : numbers) {
+			outgoing->sendToNumber(number);
+		}
+	}
+
+	void sendIndividualProto(std::string& number, textsecure::Content& proto, long int timestamp) {
+		std::vector<std::string> numbers;
+		numbers.push_back(number);
+
+		sendMessageProto(timestamp, numbers, proto, [] {
+			// if (res.errors.length > 0)
+			// 	reject(res);
+			// else
+			// 	resolve(res);
+		});
 	}
 
 	void sendRequestGroupSyncMessage() {
@@ -57,14 +70,16 @@ public:
 		if (!myDevice || myDevice == 1)
 			return;
 
-		// var request = new textsecure.protobuf.SyncMessage.Request();
-		// request.type = textsecure.protobuf.SyncMessage.Request.Type.GROUPS;
-		// var syncMessage = new textsecure.protobuf.SyncMessage();
-		// syncMessage.request = request;
-		// var contentMessage = new textsecure.protobuf.Content();
-		// contentMessage.syncMessage = syncMessage;
+		textsecure::SyncMessage_Request *request = new textsecure::SyncMessage_Request;
+		request->set_type(textsecure::SyncMessage_Request::GROUPS);
 
-		// return sendIndividualProto(myNumber, contentMessage, Date.now());
+		textsecure::SyncMessage *syncMessage = new textsecure::SyncMessage;
+		syncMessage->set_allocated_request(request);
+
+		textsecure::Content contentMessage;
+		contentMessage.set_allocated_syncmessage(syncMessage);
+
+		return sendIndividualProto(myNumber, contentMessage, getTimestamp());
 	}
 
 	void sendRequestContactSyncMessage() {
@@ -79,14 +94,16 @@ public:
 		if (!myDevice || myDevice == 1)
 			return;
 
-		// var request = new textsecure.protobuf.SyncMessage.Request();
-		// request.type = textsecure.protobuf.SyncMessage.Request.Type.CONTACTS;
-		// var syncMessage = new textsecure.protobuf.SyncMessage();
-		// syncMessage.request = request;
-		// var contentMessage = new textsecure.protobuf.Content();
-		// contentMessage.syncMessage = syncMessage;
+		textsecure::SyncMessage_Request *request = new textsecure::SyncMessage_Request;
+		request->set_type(textsecure::SyncMessage_Request::CONTACTS);
 
-		// return sendIndividualProto(myNumber, contentMessage, getTimestamp());
+		textsecure::SyncMessage *syncMessage = new textsecure::SyncMessage;
+		syncMessage->set_allocated_request(request);
+
+		textsecure::Content contentMessage;
+		contentMessage.set_allocated_syncmessage(syncMessage);
+
+		return sendIndividualProto(myNumber, contentMessage, getTimestamp());
 	}
 };
 
