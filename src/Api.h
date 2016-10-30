@@ -106,20 +106,22 @@ class TextSecureServer {
 						short registrationId,
 						const std::string& deviceName);
 
-	bool getDevices() {
-		return !performCall(DEVICES, GET).empty();
+	std::string getDevices() {
+		return performCall(DEVICES, GET);
 	}
 
 	void registerKeys(prekey::result& result);
 
-	void getMyKeys() {}
+	int getMyKeys() {
+		auto res = nlohmann::json::parse(performCall(KEYS, GET, ""));
+		return res["count"].get<int>();
+	}
+	
 	nlohmann::json getKeysForNumber(std::string& number, int deviceId = 0);
 
-	bool sendMessages(const std::string& destination, char *messageArray, int timestamp) {
-		// var jsonData = { messages: messageArray, timestamp: timestamp};
-
-		//TODO: pass jsonData as data
-		return !performCall(MESSAGES, PUT, "/" + destination).empty();
+	bool sendMessages(const std::string& destination, std::string& messageArray, long int timestamp) {
+		std::string jsonData = "{\"messages\":\"" + messageArray + "\", \"timestamp\":" + std::to_string(timestamp) + "}";
+		return !performCall(MESSAGES, PUT, "/" + destination, jsonData).empty();
 	}
 
 	void getAttachment() {}
