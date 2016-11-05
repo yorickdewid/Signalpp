@@ -6,14 +6,37 @@
 namespace signalpp {
 
 struct ProtocolAddress {
-	signal_protocol_address m_address;
+	signal_protocol_address address;
 
 	ProtocolAddress(std::string number, int deviceId) {
-		m_address.name = number.c_str();
-		m_address.name_len = number.size();
-		m_address.device_id = deviceId;
+		address.name = number.c_str();
+		address.name_len = number.size();
+		address.device_id = deviceId;
 	}
 
+	std::string getName() const {
+		return address.name;
+	}
+	
+	int getDeviceId() const {
+		return address.device_id;
+	}
+	
+	std::string toString() const {
+		return std::string(address.name) + "." + std::to_string(address.device_id);
+	}
+
+	bool operator== (const ProtocolAddress &rhs) {
+		//TODO: use strcmp
+		return address.device_id == rhs.address.device_id &&
+				address.name_len == rhs.address.name_len &&
+				!memcmp(address.name, rhs.address.name, rhs.address.name_len);
+	}
+
+	friend std::ostream& operator<< (std::ostream& os, const ProtocolAddress& rhs) {
+		os << rhs.address.name << ":" << rhs.address.device_id;
+		return os;
+	}
 };
 
 } // namespace signalpp
