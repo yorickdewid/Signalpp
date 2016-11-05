@@ -119,8 +119,8 @@ class TextSecureServer {
 	
 	nlohmann::json getKeysForNumber(std::string& number, int deviceId = 0);
 
-	bool sendMessages(const std::string& destination, std::string& messageArray, long int timestamp) {
-		std::string jsonData = "{\"messages\":\"" + messageArray + "\", \"timestamp\":" + std::to_string(timestamp) + "}";
+	bool sendMessages(const std::string& destination, std::string& message, long int timestamp) {
+		std::string jsonData = "{\"messages\":\"" + message + "\", \"timestamp\":" + std::to_string(timestamp) + "}";
 		return !performCall(MESSAGES, PUT, "/" + destination, jsonData).empty();
 	}
 
