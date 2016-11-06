@@ -7,11 +7,16 @@ namespace signalpp {
 
 struct ProtocolAddress {
 	signal_protocol_address address;
+	char *_name = nullptr;
 
 	ProtocolAddress(std::string number, int deviceId) {
-		address.name = number.c_str();
+		address.name = strdup(number.c_str());
 		address.name_len = number.size();
 		address.device_id = deviceId;
+	}
+
+	~ProtocolAddress() {
+		free((void *)address.name);
 	}
 
 	std::string getName() const {

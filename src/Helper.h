@@ -35,6 +35,10 @@ static long int getTimestamp() {
 	return static_cast<long int>(time(NULL));
 }
 
+static long int getTimestampLong() {
+	return (static_cast<long int>(time(NULL)) * 1000);
+}
+
 namespace Url {
 
 static std::string Encode(const std::string &value) {
