@@ -51,21 +51,23 @@ typedef struct {
 int test_session_store_load_session(signal_buffer **record, const signal_protocol_address *address, void *user_data) {
 	test_session_store_data *data = (test_session_store_data *)user_data;
 
-	test_session_store_session *s;
+	test_session_store_session *s = nullptr;
 
 	test_session_store_session l;
-	memset(&l, 0, sizeof(test_session_store_session));
+	memset(&l, '\0', sizeof(test_session_store_session));
 	l.key.recipient_id = jenkins_hash(address->name, address->name_len);
 	l.key.device_id = address->device_id;
 	HASH_FIND(hh, data->sessions, &l.key, sizeof(test_session_store_session_key), s);
 
-	if(!s) {
+	if (!s) {
 		return 0;
 	}
+
 	signal_buffer *result = signal_buffer_copy(s->record);
-	if(!result) {
+	if (!result) {
 		return SG_ERR_NOMEM;
 	}
+
 	*record = result;
 	return 1;
 }
@@ -74,7 +76,7 @@ int test_session_store_get_sub_device_sessions(signal_int_list **sessions, const
 	test_session_store_data *data = (test_session_store_data *)user_data;
 
 	signal_int_list *result = signal_int_list_alloc();
-	if(!result) {
+	if (!result) {
 		return SG_ERR_NOMEM;
 	}
 
@@ -197,7 +199,7 @@ void test_session_store_destroy(void *user_data) {
 
 void ProtocolStore::hookSessionStore(signal_protocol_store_context *store_context) {
 	test_session_store_data *data = (test_session_store_data *)malloc(sizeof(test_session_store_data));
-	memset(data, 0, sizeof(test_session_store_data));
+	memset(data, '\0', sizeof(test_session_store_data));
 
 	signal_protocol_session_store store = {
 		.load_session_func = test_session_store_load_session,

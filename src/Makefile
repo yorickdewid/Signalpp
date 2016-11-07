@@ -1,5 +1,6 @@
 RANLIB=ranlib
 LIBSRC=CryptoProvider.cpp \
+		ProtocolStore.cpp \
 		Base64.cpp \
 		KeyHelper.cpp \
 		AccountManager.cpp \
