@@ -57,7 +57,7 @@ static size_t write_callback(void *ptr, size_t size, size_t nmemb, void *userdat
 }
 
 //TODO: verification callback
-std::string TextSecureServer::performCall(enum urlCall call, enum httpType type, const std::string& param, const std::string& data) {
+std::tuple<std::string, int> TextSecureServer::performCall(enum urlCall call, enum httpType type, const std::string& param, const std::string& data) {
 	CURL *curl;
 	CURLcode res;
 	struct dataObjectWrite writeback;
@@ -84,6 +84,7 @@ std::string TextSecureServer::performCall(enum urlCall call, enum httpType type,
 
 	curl_global_init(CURL_GLOBAL_DEFAULT);
 
+	long code = 0;
 	curl = curl_easy_init();
 	if (curl) {
 		curl_easy_setopt(curl, CURLOPT_URL, url.str().c_str());
@@ -157,7 +158,6 @@ std::string TextSecureServer::performCall(enum urlCall call, enum httpType type,
 			response = false;
 		}
 
-		long code = 0;
 		curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &code);
 
 		std::string message;
@@ -211,10 +211,10 @@ std::string TextSecureServer::performCall(enum urlCall call, enum httpType type,
 	curl_global_cleanup();
 
 	if (!writeback.size || !response) {
-		return "";
+		return std::make_tuple("", code);//TODO: throw
 	}
 
-	return std::string(writeback.writeptr, writeback.size);
+	return std::make_tuple(std::string(writeback.writeptr, writeback.size), code);
 }
 
 int TextSecureServer::confirmCode(const std::string& number,
@@ -244,7 +244,7 @@ int TextSecureServer::confirmCode(const std::string& number,
 
 	m_username = number;
 	m_password = password;
-	std::string deviceId = performCall(call, PUT, urlPrefix + code, jsonData);
+	std::string deviceId = std::get<0>(performCall(call, PUT, urlPrefix + code, jsonData));
 	if (deviceId.empty()) {
 		return 0;
 	}
@@ -295,23 +295,20 @@ json TextSecureServer::getKeysForNumber(std::string& number, int deviceId) {
 	if (!deviceId)
 		std::string uri = "/" + number + "/*";
 
-	// auto res = json::parse(performCall(KEYS, GET, uri));
-	auto res = R"({"identityKey":"BTFwfbnoMaimVLHznxWKDTruswF/FKAOKi3qDVai3UJr","devices":[{"deviceId":1,"registrationId":6922,"signedPreKey":{"keyId":8731799,"publicKey":"BUnRGYXIT+MQ1P5NaoDWgG4FtxEbB5/MEMJ6ME5qLKUJ","signature":"wogO8wlAbDvrSW6SpZwjdig8edd6gfNsEYSeAO+4rOlUsqApCmwyA/30mp1AL8wVcDpRX53tbNaTuA+N2VjbgA"},"preKey":{"keyId":12731962,"publicKey":"BQUzo4DmbT7uYDNhC+MY3KSTbqLT9pP+zsSxwVmrJdkT"}}]})"_json;
+	auto response = performCall(KEYS, GET, uri);
+	if (std::get<1>(response) != 200) {
+		return nullptr;
+	}
+
+	auto res = json::parse(std::get<0>(response));
+	// auto res = R"({"identityKey":"BTFwfbnoMaimVLHznxWKDTruswF/FKAOKi3qDVai3UJr","devices":[{"deviceId":1,"registrationId":6922,"signedPreKey":{"keyId":8731799,"publicKey":"BUnRGYXIT+MQ1P5NaoDWgG4FtxEbB5/MEMJ6ME5qLKUJ","signature":"wogO8wlAbDvrSW6SpZwjdig8edd6gfNsEYSeAO+4rOlUsqApCmwyA/30mp1AL8wVcDpRX53tbNaTuA+N2VjbgA"},"preKey":{"keyId":12731962,"publicKey":"BQUzo4DmbT7uYDNhC+MY3KSTbqLT9pP+zsSxwVmrJdkT"}}]})"_json;
 	if (!res["devices"].is_array()) {
 		SIGNAL_LOG_ERROR << "Invalid response";
 	}
 
-	SIGNAL_LOG_INFO << res["identityKey"].get<std::string>();
-
 	res["identityKey"] = Base64::Decode(res["identityKey"].get<std::string>());
 
-	SIGNAL_LOG_INFO << "identityKey size " << res["identityKey"].get<std::string>().size();
-
 	for (auto& device : res["devices"]) {
-		SIGNAL_LOG_INFO << "signedPreKey publicKey " << device["signedPreKey"]["publicKey"];
-		SIGNAL_LOG_INFO << "signedPreKey signature " << device["signedPreKey"]["signature"];
-		SIGNAL_LOG_INFO << "preKey publicKey " << device["preKey"]["publicKey"];
-
 		device["signedPreKey"]["publicKey"] = Base64::Decode(device["signedPreKey"]["publicKey"]);
 		device["signedPreKey"]["signature"] = Base64::Decode(device["signedPreKey"]["signature"]);
 		device["preKey"]["publicKey"] = Base64::Decode(device["preKey"]["publicKey"]);

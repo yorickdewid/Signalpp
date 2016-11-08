@@ -53,7 +53,10 @@ class TextSecureServer {
 
 	std::map<enum urlCall, std::string> endpoint;
 	
-	std::string performCall(enum urlCall call, enum httpType type, const std::string& param = "", const std::string& data = "");
+	std::tuple<std::string, int> performCall(enum urlCall call,
+												enum httpType type,
+												const std::string& param = "",
+												const std::string& data = "");
 
   public:
 	TextSecureServer(const std::string& url,
@@ -91,12 +94,12 @@ class TextSecureServer {
 		return os.str();
 	}
 
-	inline bool requestVerificationSMS(const std::string& number) {
-		return !performCall(ACCOUNTS, GET, "/sms/code/" + number).empty();
+	inline int requestVerificationSMS(const std::string& number) {
+		return std::get<1>(performCall(ACCOUNTS, GET, "/sms/code/" + number));
 	}
 
-	inline bool requestVerificationVoice(const std::string& number) {
-		return !performCall(ACCOUNTS, GET, "/voice/code/" + number).empty();
+	inline int requestVerificationVoice(const std::string& number) {
+		return std::get<1>(performCall(ACCOUNTS, GET, "/voice/code/" + number));
 	}
 
 	int confirmCode(const std::string& number,
@@ -107,21 +110,23 @@ class TextSecureServer {
 						const std::string& deviceName);
 
 	std::string getDevices() {
-		return performCall(DEVICES, GET);
+		return std::get<0>(performCall(DEVICES, GET));
 	}
 
 	void registerKeys(prekey::result& result);
 
 	int getMyKeys() {
-		auto res = nlohmann::json::parse(performCall(KEYS, GET, ""));
+		auto res = nlohmann::json::parse(std::get<0>(performCall(KEYS, GET, "")));
 		return res["count"].get<int>();
 	}
 	
 	nlohmann::json getKeysForNumber(std::string& number, int deviceId = 0);
 
-	bool sendMessages(const std::string& destination, std::string& message, long int timestamp) {
-		std::string jsonData = "{\"messages\":\"" + message + "\", \"timestamp\":" + std::to_string(timestamp) + "}";
-		return !performCall(MESSAGES, PUT, "/" + destination, jsonData).empty();
+	std::tuple<std::string, int> sendMessages(const std::string& destination, std::string& message, long int timestamp) {
+		std::string jsonData = "{\"messages\":" + message + ",\"timestamp\":" + std::to_string(timestamp) + "}";
+		SIGNAL_LOG_INFO << "jsonData: " << jsonData;
+
+		return performCall(MESSAGES, PUT, "/" + destination, jsonData);
 	}
 
 	void getAttachment() {}
