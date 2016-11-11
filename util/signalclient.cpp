@@ -47,7 +47,7 @@ void init(bool firstRun = false) {
 		username, password, signalingKey,
 		signalpp::attachmentServerUrl);
 
-	if (firstRun) {
+	// if (firstRun) {
 		int device_id = 0;
 		if (!storage.get("device_id", device_id))
 			return;
@@ -68,7 +68,7 @@ void init(bool firstRun = false) {
 			SIGNAL_LOG_INFO << "Sync timed out";
 			syncRequest.onContactSyncComplete();
 		});
-	}
+	// }
 }
 
 void register_client() {

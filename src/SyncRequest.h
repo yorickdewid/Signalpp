@@ -42,7 +42,7 @@ public:
 		// this.receiver = receiver;
 
 		sender.sendRequestContactSyncMessage();
-		sender.sendRequestGroupSyncMessage();
+		// sender.sendRequestGroupSyncMessage();
 		// this.timeout = setTimeout(this.onTimeout.bind(this), 60000);
 	}
 

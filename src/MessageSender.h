@@ -79,7 +79,7 @@ public:
 		textsecure::Content contentMessage;
 		contentMessage.set_allocated_syncmessage(syncMessage);
 
-		return sendIndividualProto(myNumber, contentMessage, getTimestamp());
+		return sendIndividualProto(myNumber, contentMessage, getTimestampLong());
 	}
 
 	void sendRequestContactSyncMessage() {
@@ -103,7 +103,7 @@ public:
 		textsecure::Content contentMessage;
 		contentMessage.set_allocated_syncmessage(syncMessage);
 
-		return sendIndividualProto(myNumber, contentMessage, getTimestamp());
+		return sendIndividualProto(myNumber, contentMessage, getTimestampLong());
 	}
 };
 

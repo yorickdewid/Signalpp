@@ -55,11 +55,10 @@ ProvisionInfo ProvisioningCipher::decrypt(textsecure::ProvisionEnvelope& provisi
 
 	/* Derive shared secret */
 	uint8_t *shared_secret = nullptr;
-
 	ec_private_key *private_key = ec_key_pair_get_private(key_pair);
 	ec_public_key *public_key = nullptr;
 
-	int result = curve_decode_point(&public_key, (const uint8_t *)masterEphemeral.c_str(), masterEphemeral.size(), context);
+	int result = curve_decode_point(&public_key, (const uint8_t *)masterEphemeral.c_str(), masterEphemeral.size(), context); //TODO: c_str() to data()
 	if (result) {
 		SIGNAL_LOG_ERROR << "Cannot decode public key";
 		return info; //TODO: throw

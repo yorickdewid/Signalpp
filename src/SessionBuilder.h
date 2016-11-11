@@ -8,6 +8,8 @@
 #include <signal_protocol.h>
 #include <session_builder.h>
 #include <session_state.h>
+#include <session_cipher.h>
+#include <protocol.h>
 
 namespace signalpp {
 
@@ -15,26 +17,29 @@ class SessionBuilder {
 	signal_context *context = nullptr;
 	signal_protocol_store_context *store_context = nullptr;
 	session_builder *m_session_builder = nullptr;
-	ProtocolAddress m_address;
+	session_cipher *m_session_cipher = nullptr;
+	ProtocolAddress *m_address = nullptr;
 
 public:
-	SessionBuilder(ProtocolAddress& address) : m_address(address) {
+	SessionBuilder(ProtocolAddress *address) : m_address(address) {
 		signal_context_create(&context, 0);//TODO: move
 
 		CryptoProvider::hook(context);
 		ProtocolStore::hook(&store_context, context);
 
-		int result = session_builder_create(&m_session_builder, store_context, &m_address.address, context);
+		int result = session_builder_create(&m_session_builder, store_context, &m_address->address, context);
 		if (result) {
 			SIGNAL_LOG_ERROR << "session_builder_create() failed";
 		}
 	}
 
 	~SessionBuilder() {
+		delete m_address;
+
 		signal_context_destroy(context);
 	}
 
-	void processPreKey(nlohmann::json& device) {
+	void processPreKey(nlohmann::json device) {
 		session_pre_key_bundle *pre_key = nullptr;
 
 		/* Convert prekey */
@@ -92,27 +97,68 @@ public:
 			return;
 		}
 
+		// TESTING //
+
 		/* Check that we can load the session state and verify its version */
-		result = signal_protocol_session_contains_session(store_context, &m_address.address);
-		if (result != 1) {
-			SIGNAL_LOG_ERROR << "signal_protocol_session_contains_session() failed";
-			return;
-		}
+		// result = signal_protocol_session_contains_session(store_context, &m_address.address);
+		// if (result != 1) {
+		// 	SIGNAL_LOG_ERROR << "signal_protocol_session_contains_session() failed";
+		// 	return;
+		// }
 
-		session_record *loaded_record = nullptr;
-		session_state *loaded_record_state = nullptr;
-		result = signal_protocol_session_load_session(store_context, &loaded_record, &m_address.address);
+		// session_record *loaded_record = nullptr;
+		// session_state *loaded_record_state = nullptr;
+		// result = signal_protocol_session_load_session(store_context, &loaded_record, &m_address.address);
 		
-		loaded_record_state = session_record_get_state(loaded_record);
+		// loaded_record_state = session_record_get_state(loaded_record);
 
-
-		if (session_state_get_session_version(loaded_record_state) != 3) {
-			SIGNAL_LOG_ERROR << "Invalid session version";
-			return;
-		}
+		// if (session_state_get_session_version(loaded_record_state) != 3) {
+		// 	SIGNAL_LOG_ERROR << "Invalid session version";
+		// 	return;
+		// }
 
 		SIGNAL_LOG_INFO << "All good!";
+		// SIGNAL_UNREF(loaded_record);
+	}
+
+	std::pair<std::string, int> encryptToDevice(std::string plaintext) {
+		int result = session_cipher_create(&m_session_cipher, store_context, &m_address->address, context);
+		if (result) {
+			SIGNAL_LOG_ERROR << "session_cipher_create() failed";
+			return std::make_pair("", 0);//TODO: throw
+		}
+
+		ciphertext_message *ciphertext = nullptr;
+		result = session_cipher_encrypt(m_session_cipher, (uint8_t *)plaintext.data(), plaintext.size(), &ciphertext);
+		if (result) {
+			SIGNAL_LOG_ERROR << "session_cipher_encrypt() failed";
+			return std::make_pair("", 0);//TODO: throw
+		}
+
+		signal_buffer *buffer = ciphertext_message_get_serialized(ciphertext);
+		int type = ciphertext_message_get_type(ciphertext);
+
+		return std::make_pair(std::string((char *)signal_buffer_data(buffer), signal_buffer_len(buffer)), type);
+	}
+
+	unsigned int getRegistrationId() {
+		session_record *loaded_record = nullptr;
+		int result = signal_protocol_session_load_session(store_context, &loaded_record, &m_address->address);
+		
+		session_state *loaded_record_state = session_record_get_state(loaded_record);
+		unsigned int id = session_state_get_local_registration_id(loaded_record_state);
+
 		SIGNAL_UNREF(loaded_record);
+
+		return id;
+	}
+
+	unsigned int getRegistrationRemoteId() {
+		unsigned int id = 0;
+
+		session_cipher_get_remote_registration_id(m_session_cipher, &id);
+
+		return id;
 	}
 
 	// void processV3(record, message) {

@@ -7,7 +7,7 @@ using namespace signalpp;
 
 void MessageReceiver::connect() {
 	SIGNAL_LOG_INFO << "Opening websocket";
-
+return;
 	/* Initialize the socket and start listening for messages */	
 	m_socket = m_server->getMessageSocket();
 	

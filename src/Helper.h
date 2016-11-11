@@ -36,7 +36,7 @@ static long int getTimestamp() {
 }
 
 static long int getTimestampLong() {
-	return (static_cast<long int>(time(NULL)) * 1000);
+	return (static_cast<long int>(time(NULL)) * 1000) + 123;
 }
 
 namespace Url {
