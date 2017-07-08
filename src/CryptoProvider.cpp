@@ -335,15 +335,15 @@ unsigned char *aes_cbc_decrypt(unsigned char *key, unsigned char *iv, unsigned c
 
 void CryptoProvider::hook(signal_context *context) {
 	signal_crypto_provider provider = {
-		.random_func = randomGenerator,
-		.hmac_sha256_init_func = HMAC_SHA256Init,
-		.hmac_sha256_update_func = HMAC_SHA256Update,
-		.hmac_sha256_final_func = HMAC_SHA256Final,
-		.hmac_sha256_cleanup_func = HMAC_SHA256Cleanup,
-		.sha512_digest_func = SHA512Digest,
-		.encrypt_func = encrypt_raw,
-		.decrypt_func = decrypt_raw,
-		.user_data = nullptr
+		randomGenerator,
+		HMAC_SHA256Init,
+		HMAC_SHA256Update,
+		HMAC_SHA256Final,
+		HMAC_SHA256Cleanup,
+		SHA512Digest,
+		encrypt_raw,
+		decrypt_raw,
+		nullptr
 	};
 
 	signal_context_set_crypto_provider(context, &provider);
@@ -379,7 +379,8 @@ hmac_complete:
 	signal_buffer_free(output_buffer);
 
 	if (result < 0) {
-		SIGNAL_LOG_ERROR << "Cannot calculate HMAC";
+		//SIGNAL_LOG_ERROR << "Cannot calculate HMAC";
+		std::cerr << "Cannot calculate HMAC" << std::endl;
 		return nullptr;//TODO: throw
 	}
 
@@ -390,7 +391,8 @@ bool CryptoProvider::verifyMAC(std::string& data, std::string& key, std::string&
 	std::string calculatedMAC = HMAC(key, data);
 
 	if (mac.size() != length || calculatedMAC.size() != length) {
-		SIGNAL_LOG_ERROR << "Bad MAC length";
+		//SIGNAL_LOG_ERROR << "Bad MAC length";
+		std::cerr << "Bad MAC length" << std::endl;
 		return false;//TODO: throw
 	}
 

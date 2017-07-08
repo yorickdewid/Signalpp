@@ -202,14 +202,14 @@ void ProtocolStore::hookSessionStore(signal_protocol_store_context *store_contex
 	memset(data, '\0', sizeof(test_session_store_data));
 
 	signal_protocol_session_store store = {
-		.load_session_func = test_session_store_load_session,
-		.get_sub_device_sessions_func = test_session_store_get_sub_device_sessions,
-		.store_session_func = test_session_store_store_session,
-		.contains_session_func = test_session_store_contains_session,
-		.delete_session_func = test_session_store_delete_session,
-		.delete_all_sessions_func = test_session_store_delete_all_sessions,
-		.destroy_func = test_session_store_destroy,
-		.user_data = data
+		test_session_store_load_session,
+		test_session_store_get_sub_device_sessions,
+		test_session_store_store_session,
+		test_session_store_contains_session,
+		test_session_store_delete_session,
+		test_session_store_delete_all_sessions,
+		test_session_store_destroy,
+		data
 	};
 
 	signal_protocol_store_context_set_session_store(store_context, &store);
@@ -315,12 +315,12 @@ void ProtocolStore::hookPrekeyStore(signal_protocol_store_context *store_context
 	memset(data, 0, sizeof(test_pre_key_store_data));
 
 	signal_protocol_pre_key_store store = {
-		.load_pre_key = test_pre_key_store_load_pre_key,
-		.store_pre_key = test_pre_key_store_store_pre_key,
-		.contains_pre_key = test_pre_key_store_contains_pre_key,
-		.remove_pre_key = test_pre_key_store_remove_pre_key,
-		.destroy_func = test_pre_key_store_destroy,
-		.user_data = data
+		test_pre_key_store_load_pre_key,
+		test_pre_key_store_store_pre_key,
+		test_pre_key_store_contains_pre_key,
+		test_pre_key_store_remove_pre_key,
+		test_pre_key_store_destroy,
+		data
 	};
 
 	signal_protocol_store_context_set_pre_key_store(store_context, &store);
@@ -425,12 +425,12 @@ void ProtocolStore::hookSignedPrekeyStore(signal_protocol_store_context *store_c
 	memset(data, 0, sizeof(test_signed_pre_key_store_data));
 
 	signal_protocol_signed_pre_key_store store = {
-			.load_signed_pre_key = test_signed_pre_key_store_load_signed_pre_key,
-			.store_signed_pre_key = test_signed_pre_key_store_store_signed_pre_key,
-			.contains_signed_pre_key = test_signed_pre_key_store_contains_signed_pre_key,
-			.remove_signed_pre_key = test_signed_pre_key_store_remove_signed_pre_key,
-			.destroy_func = test_signed_pre_key_store_destroy,
-			.user_data = data
+			test_signed_pre_key_store_load_signed_pre_key,
+			test_signed_pre_key_store_store_signed_pre_key,
+			test_signed_pre_key_store_contains_signed_pre_key,
+			test_signed_pre_key_store_remove_signed_pre_key,
+			test_signed_pre_key_store_destroy,
+			data
 	};
 
 	signal_protocol_store_context_set_signed_pre_key_store(store_context, &store);
@@ -555,12 +555,12 @@ void ProtocolStore::hookIdentityKeyStore(signal_protocol_store_context *store_co
 	data->local_registration_id = (rand() % 16380) + 1;
 
 	signal_protocol_identity_key_store store = {
-			.get_identity_key_pair = test_identity_key_store_get_identity_key_pair,
-			.get_local_registration_id = test_identity_key_store_get_local_registration_id,
-			.save_identity = test_identity_key_store_save_identity,
-			.is_trusted_identity = test_identity_key_store_is_trusted_identity,
-			.destroy_func = test_identity_key_store_destroy,
-			.user_data = data
+			test_identity_key_store_get_identity_key_pair,
+			test_identity_key_store_get_local_registration_id,
+			test_identity_key_store_save_identity,
+			test_identity_key_store_is_trusted_identity,
+			test_identity_key_store_destroy,
+			data
 	};
 
 	signal_protocol_store_context_set_identity_key_store(store_context, &store);
@@ -665,10 +665,10 @@ void ProtocolStore::hookSenderKeyStore(signal_protocol_store_context *store_cont
 	memset(data, 0, sizeof(test_sender_key_store_data));
 
 	signal_protocol_sender_key_store store = {
-		.store_sender_key = test_sender_key_store_store_sender_key,
-		.load_sender_key = test_sender_key_store_load_sender_key,
-		.destroy_func = test_sender_key_store_destroy,
-		.user_data = data
+		test_sender_key_store_store_sender_key,
+		test_sender_key_store_load_sender_key,
+		test_sender_key_store_destroy,
+		data
 	};
 
 	signal_protocol_store_context_set_sender_key_store(store_context, &store);

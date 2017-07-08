@@ -16,7 +16,8 @@ return;
 	});
 
 	m_socket->onFail([] {
-		SIGNAL_LOG_ERROR << "MessageReceiver Websocket error";
+		//SIGNAL_LOG_ERROR << "MessageReceiver Websocket error";
+		std::cerr << "MessageReceiver Websocket error" << std::endl;
 	});
 
 	//TODO: move into member function

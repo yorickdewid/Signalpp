@@ -107,7 +107,9 @@
     <ClCompile Include="..\src\Base64.cpp" />
     <ClCompile Include="..\src\CryptoProvider.cpp" />
     <ClCompile Include="..\src\DeviceMessages.cpp" />
-    <ClCompile Include="..\src\DummyHandler.cpp" />
+    <ClCompile Include="..\src\DummyHandler.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\src\IncomingPushMessageSignal.cpp" />
     <ClCompile Include="..\src\KeyHelper.cpp" />
     <ClCompile Include="..\src\MessageReceiver.cpp" />

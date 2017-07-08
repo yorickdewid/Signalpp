@@ -45,10 +45,10 @@ class TextSecureServer {
 	};
 
 	enum httpType {
-		GET,
-		PUT,
-		POST,
-		DELETE,
+		_GET,
+		_PUT,
+		_POST,
+		_DELETE,
 	};
 
 	std::map<enum urlCall, std::string> endpoint;
@@ -95,11 +95,11 @@ class TextSecureServer {
 	}
 
 	inline int requestVerificationSMS(const std::string& number) {
-		return std::get<1>(performCall(ACCOUNTS, GET, "/sms/code/" + number));
+		return std::get<1>(performCall(ACCOUNTS, _GET, "/sms/code/" + number));
 	}
 
 	inline int requestVerificationVoice(const std::string& number) {
-		return std::get<1>(performCall(ACCOUNTS, GET, "/voice/code/" + number));
+		return std::get<1>(performCall(ACCOUNTS, _GET, "/voice/code/" + number));
 	}
 
 	int confirmCode(const std::string& number,
@@ -110,13 +110,13 @@ class TextSecureServer {
 						const std::string& deviceName);
 
 	std::string getDevices() {
-		return std::get<0>(performCall(DEVICES, GET));
+		return std::get<0>(performCall(DEVICES, _GET));
 	}
 
 	void registerKeys(prekey::result& result);
 
 	int getMyKeys() {
-		auto res = nlohmann::json::parse(std::get<0>(performCall(KEYS, GET, "")));
+		auto res = nlohmann::json::parse(std::get<0>(performCall(KEYS, _GET, "")));
 		return res["count"].get<int>();
 	}
 	
@@ -126,7 +126,7 @@ class TextSecureServer {
 		std::string jsonData = "{\"messages\":" + message + ",\"timestamp\":" + std::to_string(timestamp) + "}";
 		SIGNAL_LOG_INFO << "jsonData: " << jsonData;
 
-		return performCall(MESSAGES, PUT, "/" + destination, jsonData);
+		return performCall(MESSAGES, _PUT, "/" + destination, jsonData);
 	}
 
 	void getAttachment() {}

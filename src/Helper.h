@@ -12,9 +12,13 @@ namespace signalpp {
 namespace {
 
 static const char *getDeviceName() {
+#ifdef _WIN32
+	return "Kaas";
+#else
 	static char hostname[1024];
 	gethostname(hostname, 1024);
 	return hostname;
+#endif
 }
 
 static const char *getVersion() {

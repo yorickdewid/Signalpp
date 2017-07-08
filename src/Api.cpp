@@ -91,16 +91,16 @@ std::tuple<std::string, int> TextSecureServer::performCall(enum urlCall call, en
 
 		/* Set HTTP type */
 		switch (type) {
-			case GET:
+			case _GET:
 				curl_easy_setopt(curl, CURLOPT_HTTPGET, 1L);
 				break;
-			case PUT:
+			case _PUT:
 				curl_easy_setopt(curl, CURLOPT_PUT, 1L);
 				break;
-			case POST:
+			case _POST:
 				curl_easy_setopt(curl, CURLOPT_POST, 1L);
 				break;
-			case DELETE:
+			case _DELETE:
 				curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "DELETE"); 
 				break;
 		}
@@ -154,7 +154,8 @@ std::tuple<std::string, int> TextSecureServer::performCall(enum urlCall call, en
 
 		/* Check for errors */ 
 		if (res != CURLE_OK) {
-			SIGNAL_LOG_ERROR << "curl_easy_perform() failed: " << curl_easy_strerror(res);
+			//SIGNAL_LOG_ERROR << "curl_easy_perform() failed: " << curl_easy_strerror(res);
+			std::cerr << "curl_easy_perform() failed: " << curl_easy_strerror(res) << std::endl;
 			response = false;
 		}
 
@@ -244,7 +245,7 @@ int TextSecureServer::confirmCode(const std::string& number,
 
 	m_username = number;
 	m_password = password;
-	std::string deviceId = std::get<0>(performCall(call, PUT, urlPrefix + code, jsonData));
+	std::string deviceId = std::get<0>(performCall(call, _PUT, urlPrefix + code, jsonData));
 	if (deviceId.empty()) {
 		return 0;
 	}
@@ -287,7 +288,7 @@ void TextSecureServer::registerKeys(prekey::result& result) {
 	keys += "\"lastResortKey\":{\"keyId\":2147483647,\"publicKey\":\"NDI=\"}";
 	keys += "}";
 
-	performCall(KEYS, PUT, "", keys);
+	performCall(KEYS, _PUT, "", keys);
 }
 
 json TextSecureServer::getKeysForNumber(std::string& number, int deviceId) {
@@ -295,7 +296,7 @@ json TextSecureServer::getKeysForNumber(std::string& number, int deviceId) {
 	if (!deviceId)
 		std::string uri = "/" + number + "/*";
 
-	auto response = performCall(KEYS, GET, uri);
+	auto response = performCall(KEYS, _GET, uri);
 	if (std::get<1>(response) != 200) {
 		return nullptr;
 	}
@@ -303,7 +304,8 @@ json TextSecureServer::getKeysForNumber(std::string& number, int deviceId) {
 	auto res = json::parse(std::get<0>(response));
 	// auto res = R"({"identityKey":"BTFwfbnoMaimVLHznxWKDTruswF/FKAOKi3qDVai3UJr","devices":[{"deviceId":1,"registrationId":6922,"signedPreKey":{"keyId":8731799,"publicKey":"BUnRGYXIT+MQ1P5NaoDWgG4FtxEbB5/MEMJ6ME5qLKUJ","signature":"wogO8wlAbDvrSW6SpZwjdig8edd6gfNsEYSeAO+4rOlUsqApCmwyA/30mp1AL8wVcDpRX53tbNaTuA+N2VjbgA"},"preKey":{"keyId":12731962,"publicKey":"BQUzo4DmbT7uYDNhC+MY3KSTbqLT9pP+zsSxwVmrJdkT"}}]})"_json;
 	if (!res["devices"].is_array()) {
-		SIGNAL_LOG_ERROR << "Invalid response";
+		//SIGNAL_LOG_ERROR << "Invalid response";
+		std::cerr << "Invalid response" << std::endl;
 	}
 
 	res["identityKey"] = Base64::Decode(res["identityKey"].get<std::string>());
