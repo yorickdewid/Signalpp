@@ -27,7 +27,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
@@ -72,11 +72,13 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>C:\Users\eve\Projects\Signalpp\libwebsockets\build\include;C:\Users\eve\Projects\Signalpp\packages\openssl.v140.windesktop.msvcstl.static.rt-dyn.x64.1.0.2.1\build\native\include;C:\Users\eve\Projects\Signalpp\libsignal-protocol-c\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
@@ -151,8 +153,26 @@
     <None Include="..\proto\IncomingPushMessageSignal.proto" />
     <None Include="..\proto\WebSocketProtocol.proto" />
     <None Include="..\proto\WhisperTextProtocol.proto" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\packages\protobuf.2.6.1.1\build\native\protobuf.targets" Condition="Exists('..\packages\protobuf.2.6.1.1\build\native\protobuf.targets')" />
+    <Import Project="..\packages\leveldb-vc140.1.16.0.5\build\native\leveldb-vc140.targets" Condition="Exists('..\packages\leveldb-vc140.1.16.0.5\build\native\leveldb-vc140.targets')" />
+    <Import Project="..\packages\libcurl_wp8.redist.0.0.0.2\build\native\libcurl_wp8.redist.targets" Condition="Exists('..\packages\libcurl_wp8.redist.0.0.0.2\build\native\libcurl_wp8.redist.targets')" />
+    <Import Project="..\packages\libcurl_wp8.0.0.0.2\build\native\libcurl_wp8.targets" Condition="Exists('..\packages\libcurl_wp8.0.0.0.2\build\native\libcurl_wp8.targets')" />
+    <Import Project="..\packages\zlib.v140.windesktop.msvcstl.static.rt-dyn.1.2.8.8\build\native\zlib.v140.windesktop.msvcstl.static.rt-dyn.targets" Condition="Exists('..\packages\zlib.v140.windesktop.msvcstl.static.rt-dyn.1.2.8.8\build\native\zlib.v140.windesktop.msvcstl.static.rt-dyn.targets')" />
+    <Import Project="..\packages\openssl.v140.windesktop.msvcstl.static.rt-dyn.x64.1.0.2.1\build\native\openssl.v140.windesktop.msvcstl.static.rt-dyn.x64.targets" Condition="Exists('..\packages\openssl.v140.windesktop.msvcstl.static.rt-dyn.x64.1.0.2.1\build\native\openssl.v140.windesktop.msvcstl.static.rt-dyn.x64.targets')" />
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\protobuf.2.6.1.1\build\native\protobuf.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\protobuf.2.6.1.1\build\native\protobuf.targets'))" />
+    <Error Condition="!Exists('..\packages\leveldb-vc140.1.16.0.5\build\native\leveldb-vc140.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\leveldb-vc140.1.16.0.5\build\native\leveldb-vc140.targets'))" />
+    <Error Condition="!Exists('..\packages\libcurl_wp8.redist.0.0.0.2\build\native\libcurl_wp8.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\libcurl_wp8.redist.0.0.0.2\build\native\libcurl_wp8.redist.targets'))" />
+    <Error Condition="!Exists('..\packages\libcurl_wp8.0.0.0.2\build\native\libcurl_wp8.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\libcurl_wp8.0.0.0.2\build\native\libcurl_wp8.targets'))" />
+    <Error Condition="!Exists('..\packages\zlib.v140.windesktop.msvcstl.static.rt-dyn.1.2.8.8\build\native\zlib.v140.windesktop.msvcstl.static.rt-dyn.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\zlib.v140.windesktop.msvcstl.static.rt-dyn.1.2.8.8\build\native\zlib.v140.windesktop.msvcstl.static.rt-dyn.targets'))" />
+    <Error Condition="!Exists('..\packages\openssl.v140.windesktop.msvcstl.static.rt-dyn.x64.1.0.2.1\build\native\openssl.v140.windesktop.msvcstl.static.rt-dyn.x64.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\openssl.v140.windesktop.msvcstl.static.rt-dyn.x64.1.0.2.1\build\native\openssl.v140.windesktop.msvcstl.static.rt-dyn.x64.targets'))" />
+  </Target>
 </Project>

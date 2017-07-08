@@ -60,17 +60,16 @@ int c_callback(struct lws *wsi, enum lws_callback_reasons reason,
 	return 0;
 }
 
-static struct lws_protocols protocols[] = {{
-		.name = "c_callback",
-		.callback = &c_callback,
-		.per_session_data_size = 0,
-		.rx_buffer_size = 256,
-		.id = 0,
-		.user = nullptr,
+static struct lws_protocols protocols[] = {
+	{
+		"c_callback",
+		c_callback,
+		0,
+		256,
 	},
-
-	{ nullptr, nullptr, 0, 0 } /* terminator */
+	{ NULL, NULL, 0, 0 } /* end */
 };
+
 
 static const struct lws_extension exts[] = {
 	{ "permessage-deflate", lws_extension_callback_pm_deflate, "permessage-deflate; client_max_window_bits" },
@@ -88,7 +87,8 @@ Websocket::Websocket(const std::string& uri) {
 
 	/* Parse URI */
 	if (lws_parse_uri((char *)uri.c_str(), &_proto, &_address, &m_conn_info.port, &_path)) {
-		SIGNAL_LOG_ERROR << "Parsing uri error";
+		// SIGNAL_LOG_ERROR << "Parsing uri error";
+		std::cerr << "Parsing uri error" << std::endl;
 		return;
 	}
 
@@ -119,7 +119,8 @@ Websocket::Websocket(const std::string& uri) {
 
 	m_context = lws_create_context(&m_info);
 	if (!m_context) {
-		SIGNAL_LOG_ERROR << "Creating libwebsocket context failed";
+		//SIGNAL_LOG_ERROR << "Creating libwebsocket context failed";
+		std::cerr << "Creating libwebsocket context failed" << std::endl;
 		return;
 	}
 

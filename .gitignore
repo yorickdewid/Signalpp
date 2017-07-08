@@ -33,3 +33,4 @@
 *.idb
 build/Debug/
 .vs/
+packages/

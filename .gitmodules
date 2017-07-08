@@ -4,3 +4,7 @@
 [submodule "libqrencode"]
 	path = libqrencode
 	url = https://github.com/fukuchi/libqrencode
+[submodule "libwebsockets"]
+	path = libwebsockets
+	url = https://github.com/warmcat/libwebsockets
+	branch = v2.2-stable
