@@ -1,0 +1,158 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{CBF5D013-1CD0-4F61-BD4B-9376D894068B}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>libsignal++</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\AccountManager.cpp" />
+    <ClCompile Include="..\src\Api.cpp" />
+    <ClCompile Include="..\src\Base64.cpp" />
+    <ClCompile Include="..\src\CryptoProvider.cpp" />
+    <ClCompile Include="..\src\DeviceMessages.cpp" />
+    <ClCompile Include="..\src\DummyHandler.cpp" />
+    <ClCompile Include="..\src\IncomingPushMessageSignal.cpp" />
+    <ClCompile Include="..\src\KeyHelper.cpp" />
+    <ClCompile Include="..\src\MessageReceiver.cpp" />
+    <ClCompile Include="..\src\ProtocolStore.cpp" />
+    <ClCompile Include="..\src\ProvisioningCipher.cpp" />
+    <ClCompile Include="..\src\Websocket.cpp" />
+    <ClCompile Include="..\src\WebSocketProtocol.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\signalpp\signalpp.h" />
+    <ClInclude Include="..\src\AccountManager.h" />
+    <ClInclude Include="..\src\Api.h" />
+    <ClInclude Include="..\src\Base64.h" />
+    <ClInclude Include="..\src\Config.h" />
+    <ClInclude Include="..\src\CryptoProvider.h" />
+    <ClInclude Include="..\src\DeviceMessages.pb.h" />
+    <ClInclude Include="..\src\Env.h" />
+    <ClInclude Include="..\src\Error.h" />
+    <ClInclude Include="..\src\Helper.h" />
+    <ClInclude Include="..\src\IncomingPushMessageSignal.pb.h" />
+    <ClInclude Include="..\src\Json.h" />
+    <ClInclude Include="..\src\KeyHelper.h" />
+    <ClInclude Include="..\src\Logger.h" />
+    <ClInclude Include="..\src\MessageReceiver.h" />
+    <ClInclude Include="..\src\MessageSender.h" />
+    <ClInclude Include="..\src\OutgoingMessage.h" />
+    <ClInclude Include="..\src\PreKeyResult.h" />
+    <ClInclude Include="..\src\ProtocolAddress.h" />
+    <ClInclude Include="..\src\ProtocolStore.h" />
+    <ClInclude Include="..\src\ProvisioningCipher.h" />
+    <ClInclude Include="..\src\Registration.h" />
+    <ClInclude Include="..\src\SessionBuilder.h" />
+    <ClInclude Include="..\src\SessionCipher.h" />
+    <ClInclude Include="..\src\Storage.h" />
+    <ClInclude Include="..\src\SyncRequest.h" />
+    <ClInclude Include="..\src\Websocket.h" />
+    <ClInclude Include="..\src\WebSocketProtocol.pb.h" />
+    <ClInclude Include="..\src\WebsocketResource.h" />
+    <ClInclude Include="..\src\_SignalProtocolStore.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\proto\DeviceMessages.proto" />
+    <None Include="..\proto\IncomingPushMessageSignal.proto" />
+    <None Include="..\proto\WebSocketProtocol.proto" />
+    <None Include="..\proto\WhisperTextProtocol.proto" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

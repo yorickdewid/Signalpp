@@ -30,3 +30,6 @@
 *.db
 *.opendb
 *.sqlite
+*.idb
+build/Debug/
+.vs/
