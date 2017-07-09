@@ -74,13 +74,13 @@ std::tuple<std::string, int> TextSecureServer::performCall(enum urlCall call, en
 	url << endpoint[call];
 	url << param;
 
-	SIGNAL_LOG_DEBUG << "Perform API call with:";
-	SIGNAL_LOG_DEBUG << "  url: " << url.str();
-	SIGNAL_LOG_DEBUG << "  type: " << type;
-	SIGNAL_LOG_DEBUG << "  data: " << data;
-	SIGNAL_LOG_DEBUG << "  Content-Type: application/json";
-	SIGNAL_LOG_DEBUG << "  user: " << m_username;
-	SIGNAL_LOG_DEBUG << "  password: " << m_password;
+	std::cout << "Perform API call with:" << std::endl;
+	std::cout << "  url: " << url.str() << std::endl;
+	std::cout << "  type: " << type << std::endl;
+	std::cout << "  data: " << data << std::endl;
+	std::cout << "  Content-Type: application/json" << std::endl;
+	std::cout << "  user: " << m_username << std::endl;
+	std::cout << "  password: " << m_password << std::endl;
 
 	curl_global_init(CURL_GLOBAL_DEFAULT);
 
@@ -197,9 +197,9 @@ std::tuple<std::string, int> TextSecureServer::performCall(enum urlCall call, en
 		}
 
 		if (writeback.size)
-			SIGNAL_LOG_DEBUG << writeback.writeptr;
-		SIGNAL_LOG_DEBUG << "Response code: " << code;
-		SIGNAL_LOG_INFO << message;
+			std::cout << writeback.writeptr << std::endl;
+		std::cout << "Response code: " << code << std::endl;
+		std::cout << message << std::endl;
 
 		curl_slist_free_all(headers); /* free the header list */
 

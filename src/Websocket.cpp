@@ -135,20 +135,20 @@ Websocket::Websocket(const std::string& uri) {
 	m_conn_info.ietf_version_or_minus_one = ietf_version;
 	m_conn_info.client_exts = exts;
 
-	SIGNAL_LOG_DEBUG << " Address: " << m_conn_info.address;
-	SIGNAL_LOG_DEBUG << " Port: " << m_conn_info.port;
-	SIGNAL_LOG_DEBUG << " Path: " << m_conn_info.path;
-	SIGNAL_LOG_DEBUG << " SSL: " << m_ssl;
+	std::cout << " Address: " << m_conn_info.address << std::endl;
+	std::cout << " Port: " << m_conn_info.port << std::endl;
+	std::cout << " Path: " << m_conn_info.path << std::endl;
+	std::cout << " SSL: " << m_ssl << std::endl;
 }
 
 Websocket::~Websocket() {
-	SIGNAL_LOG_INFO << "Cleanup";
+	std::cout << "Cleanup" << std::endl;
 
 	free((void *)m_conn_info.address);
 	free((void *)m_conn_info.path);
 
 	if (m_status == WebsocketStatus::OPEN) {
-		SIGNAL_LOG_DEBUG << "Websocket still open";
+		std::cout << "Websocket still open" << std::endl;
 		close();
 	}
 
@@ -158,7 +158,7 @@ Websocket::~Websocket() {
 void Websocket::connect() {
 	while (m_status == WebsocketStatus::CONNECT || m_status == WebsocketStatus::OPEN || !m_wsi) {
 		if (!m_wsi) {
-			SIGNAL_LOG_DEBUG << "Connecting ...";
+			std::cout << "Connecting ..." << std::endl;
 			m_conn_info.protocol = protocols[0].name;
 			m_wsi = lws_client_connect_via_info(&m_conn_info);
 			if (m_wsi)

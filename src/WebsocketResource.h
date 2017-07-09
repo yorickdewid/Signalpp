@@ -28,10 +28,10 @@ struct IncomingWebSocketRequest {
 		}
 
 		std::cout << "IncomingWebSocketRequest:" << std::endl;
-		SIGNAL_LOG_DEBUG << " verb: " << verb;
-		SIGNAL_LOG_DEBUG << " path: " << path;
-		SIGNAL_LOG_DEBUG << " body sz: " << body.size();
-		SIGNAL_LOG_DEBUG << " id: " << id;
+		std::cout << " verb: " << verb << std::endl;
+		std::cout << " path: " << path << std::endl;
+		std::cout << " body sz: " << body.size() << std::endl;
+		std::cout << " id: " << id << std::endl;
 	}
 
 	void respond(unsigned short status, const std::string message) {
@@ -74,7 +74,7 @@ class WebSocketResource {
                 )
             );
         } else if (message.type() == textsecure::WebSocketMessage::RESPONSE) {
-        	puts("Someday not far from now this function will be shaped out of the ashes of the great, great and powerfull JS core");
+			std::cout << "Someday not far from now this function will be shaped out of the ashes of the great, great and powerfull JS core" << std::endl;
             // auto response = message.response();
             // var request = outgoing[response.id()];
             // if (request) {
@@ -91,7 +91,7 @@ class WebSocketResource {
             //     throw 'Received response for unknown request ' + response.id();
             // }
         } else {
-			std::cout << "Invalid websocket request" << std::endl;
+			std::cerr << "Invalid websocket request" << std::endl;
         }
 	};
 

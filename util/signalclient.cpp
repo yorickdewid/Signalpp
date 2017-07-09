@@ -16,14 +16,14 @@ void init(bool firstRun = false) {
 		return;
 	}
 
-	SIGNAL_LOG_INFO << "Starting init";
+	std::cout << "Starting init" << std::endl;
 
 	std::string username = storage.get("number_id");
 	std::string password = storage.get("password");
 	std::string signalingKey = storage.get("signaling_key");
 
-	SIGNAL_LOG_DEBUG << "username: " << username;
-	SIGNAL_LOG_DEBUG << "password: " << password;
+	std::cout << "username: " << username << std::endl;
+	std::cout << "password: " << password << std::endl;
 
 	/* Initialize the socket and start listening for messages */
 	signalpp::MessageReceiver messageReceiver(&storage,
@@ -54,18 +54,18 @@ void init(bool firstRun = false) {
 		if (!device_id || device_id == 1)
 			return;
 
-		SIGNAL_LOG_INFO << "First run";
+		std::cout << "First run" << std::endl;
 
 		signalpp::SyncRequest syncRequest(messageSender, messageReceiver);
 		
 		syncRequest.onSuccess([&syncRequest] () {
-			SIGNAL_LOG_INFO << "Sync successful";
+			std::cout << "Sync successful" << std::endl;
 			storage.put("synced_at", signalpp::getTimestamp());
 			syncRequest.onContactSyncComplete();
 		});
 
 		syncRequest.onTimeout([&syncRequest] () {
-			SIGNAL_LOG_INFO << "Sync timed out";
+			std::cout << "Sync timed out" << std::endl;
 			syncRequest.onContactSyncComplete();
 		});
 	// }
@@ -79,12 +79,12 @@ void register_client() {
 
 	/* For the moment just show the URL */
 	auto provisionUrl = [] (const std::string& url) {
-		SIGNAL_LOG_INFO << "Provision URL: " << url;
+		std::cout << "Provision URL: " << url << std::endl;
 	};
 
 	/* For the moment just show the URL */
 	auto confirmNumber = [] (const std::string& number) -> std::string {
-		SIGNAL_LOG_INFO << "Number: " << number;
+		std::cout << "Number: " << number << std::endl;
 		return CLIENT_NAME;
 	};
 

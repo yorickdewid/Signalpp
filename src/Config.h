@@ -11,7 +11,7 @@ constexpr int patchVersion = 0;
 /* Connection strings */
 static const char serverUrl[] = "http://127.0.0.1";//"https://textsecure-service.whispersystems.org";
 static const char attachmentServerUrl[] = "https://whispersystems-textsecure-attachments.s3.amazonaws.com";
-static const unsigned short serverPorts[] = {110, 443, 80, 4433, 8443, 0};
+static const unsigned short serverPorts[] = {110, 0}; // 443, 80, 4433, 8443,
 
 }; // namespace signalpp
 

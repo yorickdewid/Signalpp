@@ -20,12 +20,12 @@ bool AccountManager::registerSecondDevice(std::function<void(const std::string&)
 	auto socket = m_server->getProvisioningSocket();
 
 	socket->onClose([] {
-		SIGNAL_LOG_INFO << "Websocket closed";
+		std::cout << "Websocket closed" << std::endl;
 	});
 
 	WebSocketResource(socket, [&] (IncomingWebSocketRequest request) {
 		if (request.path == "/v1/address" && request.verb == "PUT") {
-			SIGNAL_LOG_INFO << "UUID provisioning message";
+			std::cout << "UUID provisioning message" << std::endl;
 
 			textsecure::ProvisioningUuid provUuid;
 			provUuid.ParseFromString(request.body);
@@ -41,7 +41,7 @@ bool AccountManager::registerSecondDevice(std::function<void(const std::string&)
 
 			request.respond(200, "OK");
 		} else if (request.path == "/v1/message" && request.verb == "PUT") {
-			SIGNAL_LOG_DEBUG << "ephemeral message";
+			std::cout << "ephemeral message" << std::endl;
 
 			textsecure::ProvisionEnvelope envelope;
 			envelope.ParseFromString(request.body);
@@ -51,7 +51,7 @@ bool AccountManager::registerSecondDevice(std::function<void(const std::string&)
 			
 			auto provisionMessage = provisioningCipher.decrypt(envelope);
 			std::string deviceName = confirmNumber(provisionMessage.number);
-			SIGNAL_LOG_INFO << "Client device name: " << deviceName;
+			std::cout << "Client device name: " << deviceName << std::endl;
 
 			/* Feed data inaccount creation routine */
 			return createAccount(
@@ -62,7 +62,7 @@ bool AccountManager::registerSecondDevice(std::function<void(const std::string&)
 				provisionMessage.userAgent
 			);
 		} else {
-			SIGNAL_LOG_WARNING << "Unknown websocket message";
+			std::cout << "Unknown websocket message" << std::endl;
 		}
 
 	});
@@ -80,21 +80,21 @@ void AccountManager::createAccount(const std::string& number,
 									ec_key_pair *identityKeyPair,
 									const std::string& deviceName,
 									const std::string& userAgent) {
-	SIGNAL_LOG_INFO << "Creating new account";
+	std::cout << "Creating new account" << std::endl;
 
 	std::string signalingKey = std::string(CryptoProvider::getRandomBytes(32 + 20), 32 + 20);
 	std::string password = Base64::EncodeRaw((const unsigned char *)CryptoProvider::getRandomBytes(16), 16);
 	password = password.substr(0, password.size() - 2);
 	short int registrationId = KeyHelper::generateRegistrationId();
 
-	SIGNAL_LOG_DEBUG << "Password: " << password;
-	SIGNAL_LOG_DEBUG << "registrationId: " << registrationId;
+	std::cout << "Password: " << password << std::endl;
+	std::cout << "registrationId: " << registrationId << std::endl;
 
 	int deviceId = m_server->confirmCode(number, provisioningCode, password, signalingKey, registrationId, deviceName);
-	SIGNAL_LOG_DEBUG << "DeviceID: " << deviceId;
+	std::cout << "DeviceID: " << deviceId << std::endl;
 
 	std::string number_id = number + "." + std::to_string(deviceId);
-	SIGNAL_LOG_DEBUG << "number_id: " << number_id;
+	std::cout << "number_id: " << number_id << std::endl;
 
 	m_storage->purge("identityKey");
 	m_storage->purge("signaling_key");
