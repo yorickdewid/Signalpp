@@ -135,9 +135,9 @@ int main(int argc, char *argv[]) {
 	signalpp::Env env(&storage);
 
 	/* Register client if this first run */
-	//if (!signalpp::Registration::everDone(storage)) {
+	if (!signalpp::Registration::everDone(storage)) {
 		register_client();
-	//}
+	}
 
 	/* Initialize the client */
 	init(firstRun);

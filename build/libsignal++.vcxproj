@@ -23,7 +23,7 @@
     <ProjectGuid>{CBF5D013-1CD0-4F61-BD4B-9376D894068B}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>libsignal++</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -136,7 +136,9 @@
     <ClInclude Include="..\src\IncomingPushMessageSignal.pb.h" />
     <ClInclude Include="..\src\Json.h" />
     <ClInclude Include="..\src\KeyHelper.h" />
+    <ClInclude Include="..\src\LevelDB.h" />
     <ClInclude Include="..\src\Logger.h" />
+    <ClInclude Include="..\src\MemDB.h" />
     <ClInclude Include="..\src\MessageReceiver.h" />
     <ClInclude Include="..\src\MessageSender.h" />
     <ClInclude Include="..\src\OutgoingMessage.h" />
@@ -164,29 +166,23 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="..\packages\protobuf.2.6.1.1\build\native\protobuf.targets" Condition="Exists('..\packages\protobuf.2.6.1.1\build\native\protobuf.targets')" />
-    <Import Project="..\packages\leveldb-vc140.1.16.0.5\build\native\leveldb-vc140.targets" Condition="Exists('..\packages\leveldb-vc140.1.16.0.5\build\native\leveldb-vc140.targets')" />
     <Import Project="..\packages\libcurl_wp8.redist.0.0.0.2\build\native\libcurl_wp8.redist.targets" Condition="Exists('..\packages\libcurl_wp8.redist.0.0.0.2\build\native\libcurl_wp8.redist.targets')" />
     <Import Project="..\packages\libcurl_wp8.0.0.0.2\build\native\libcurl_wp8.targets" Condition="Exists('..\packages\libcurl_wp8.0.0.0.2\build\native\libcurl_wp8.targets')" />
     <Import Project="..\packages\zlib.v140.windesktop.msvcstl.static.rt-dyn.1.2.8.8\build\native\zlib.v140.windesktop.msvcstl.static.rt-dyn.targets" Condition="Exists('..\packages\zlib.v140.windesktop.msvcstl.static.rt-dyn.1.2.8.8\build\native\zlib.v140.windesktop.msvcstl.static.rt-dyn.targets')" />
     <Import Project="..\packages\openssl.v140.windesktop.msvcstl.static.rt-dyn.x64.1.0.2.1\build\native\openssl.v140.windesktop.msvcstl.static.rt-dyn.x64.targets" Condition="Exists('..\packages\openssl.v140.windesktop.msvcstl.static.rt-dyn.x64.1.0.2.1\build\native\openssl.v140.windesktop.msvcstl.static.rt-dyn.x64.targets')" />
     <Import Project="..\packages\protobuf-vc140.2.6.1.1\build\native\protobuf-vc140.targets" Condition="Exists('..\packages\protobuf-vc140.2.6.1.1\build\native\protobuf-vc140.targets')" />
-    <Import Project="..\packages\boost.1.59.0.0\build\native\boost.targets" Condition="Exists('..\packages\boost.1.59.0.0\build\native\boost.targets')" />
-    <Import Project="..\packages\boost_date_time-vc120.1.59.0.0\build\native\boost_date_time-vc120.targets" Condition="Exists('..\packages\boost_date_time-vc120.1.59.0.0\build\native\boost_date_time-vc120.targets')" />
-    <Import Project="..\packages\LevelDB-vc120.1.2.0.0\build\native\LevelDB-vc120.targets" Condition="Exists('..\packages\LevelDB-vc120.1.2.0.0\build\native\LevelDB-vc120.targets')" />
+    <Import Project="..\packages\sqlite3.3.8.8.3\build\native\sqlite3.targets" Condition="Exists('..\packages\sqlite3.3.8.8.3\build\native\sqlite3.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\protobuf.2.6.1.1\build\native\protobuf.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\protobuf.2.6.1.1\build\native\protobuf.targets'))" />
-    <Error Condition="!Exists('..\packages\leveldb-vc140.1.16.0.5\build\native\leveldb-vc140.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\leveldb-vc140.1.16.0.5\build\native\leveldb-vc140.targets'))" />
     <Error Condition="!Exists('..\packages\libcurl_wp8.redist.0.0.0.2\build\native\libcurl_wp8.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\libcurl_wp8.redist.0.0.0.2\build\native\libcurl_wp8.redist.targets'))" />
     <Error Condition="!Exists('..\packages\libcurl_wp8.0.0.0.2\build\native\libcurl_wp8.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\libcurl_wp8.0.0.0.2\build\native\libcurl_wp8.targets'))" />
     <Error Condition="!Exists('..\packages\zlib.v140.windesktop.msvcstl.static.rt-dyn.1.2.8.8\build\native\zlib.v140.windesktop.msvcstl.static.rt-dyn.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\zlib.v140.windesktop.msvcstl.static.rt-dyn.1.2.8.8\build\native\zlib.v140.windesktop.msvcstl.static.rt-dyn.targets'))" />
     <Error Condition="!Exists('..\packages\openssl.v140.windesktop.msvcstl.static.rt-dyn.x64.1.0.2.1\build\native\openssl.v140.windesktop.msvcstl.static.rt-dyn.x64.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\openssl.v140.windesktop.msvcstl.static.rt-dyn.x64.1.0.2.1\build\native\openssl.v140.windesktop.msvcstl.static.rt-dyn.x64.targets'))" />
     <Error Condition="!Exists('..\packages\protobuf-vc140.2.6.1.1\build\native\protobuf-vc140.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\protobuf-vc140.2.6.1.1\build\native\protobuf-vc140.targets'))" />
-    <Error Condition="!Exists('..\packages\boost.1.59.0.0\build\native\boost.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost.1.59.0.0\build\native\boost.targets'))" />
-    <Error Condition="!Exists('..\packages\boost_date_time-vc120.1.59.0.0\build\native\boost_date_time-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_date_time-vc120.1.59.0.0\build\native\boost_date_time-vc120.targets'))" />
-    <Error Condition="!Exists('..\packages\LevelDB-vc120.1.2.0.0\build\native\LevelDB-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\LevelDB-vc120.1.2.0.0\build\native\LevelDB-vc120.targets'))" />
+    <Error Condition="!Exists('..\packages\sqlite3.3.8.8.3\build\native\sqlite3.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\sqlite3.3.8.8.3\build\native\sqlite3.targets'))" />
   </Target>
 </Project>
