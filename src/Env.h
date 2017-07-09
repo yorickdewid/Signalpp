@@ -15,7 +15,7 @@ class Env {
 	StorageContainer *m_storage = nullptr;
 
 	void init() {
-		SIGNAL_LOG_INFO << "Initialize environment";
+		std::cout << "Initialize environment" << std::endl;
 
 		if (!signalpp::Registration::isDone(*m_storage)) {
 			m_storage->put("startcount", 0);

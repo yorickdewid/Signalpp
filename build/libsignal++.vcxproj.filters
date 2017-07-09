@@ -107,6 +107,12 @@
     <ClInclude Include="..\include\signalpp\signalpp.h">
       <Filter>External Includes</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\LevelDB.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\MemDB.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\AccountManager.cpp">
