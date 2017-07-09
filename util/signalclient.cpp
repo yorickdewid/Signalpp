@@ -1,8 +1,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-
-#include "getopt.h"
+#include <boost/program_options.hpp>
 
 #include <signalpp/signalpp.h>
 
@@ -95,69 +94,43 @@ void register_client() {
 	firstRun = true;
 }
 
-void usage(const char *prog) {
-	printf("Usage: %s [OPTIONS]\n\n", prog);
-	printf(" -h  --help             Show this help\n");
-	printf(" -l  --list-devices     List all registered devices\n");
-	printf(" -S  --secure           Enable additional security\n");
-	printf(" -p  --profile          Show current profile\n");
-	printf("     --sms NUMBER       Send an SMS verification code\n");
-	printf("     --voice NUMBER     Send voice verification code\n");
-	printf("     --purge            Purge current client data\n");
-	printf(" -V  --verbose          More verbose output\n");
-	printf(" -v  --version          Library version and quit\n");
-}
-
 int main(int argc, char *argv[]) {
-	int opt= 0;
+	namespace cli = boost::program_options;
 
-#ifndef _WIN32
-	static struct option long_options[] = {
-		{"list-devices",   no_argument,       0,  'l' },
-		{"profile",        no_argument,       0,  'p' },
-		{"sms",            required_argument, 0,  'S' },
-		{"voice",          required_argument, 0,  'O' },
-		{"purge",          no_argument,       0,  'P' },
-		{"secure",         no_argument,       0,  's' },
-		{"verbose",        no_argument,       0,  'V' },
-		{"help",           no_argument,       0,  'h' },
-		{"version",        no_argument,       0,  'v' },
-		{0,                0,                 0,   0  }
-	};
+	cli::variables_map vm;
+	cli::options_description desc("Usage: signalclient [OPTIONS]");
+	desc.add_options()
+		("help",    "Print help messages")
+		("add",     "additional options")
+		("purge",   "Purge current client data")
+		("version", "Library version and quit");
+	
+	try
+	{
+		cli::store(cli::parse_command_line(argc, argv, desc), vm);
 
-	int long_index = 0;
-	while ((opt = getopt_long(argc, argv, "lpvhV", long_options, &long_index )) != -1) {
-		switch (opt) {
-			case 'l' :
-				break;
-			case 'p' :
-				break;
-			case 'S' :
-				// optarg
-				break;
-			case 'O' :
-				// optarg
-				break;
-			case 'P' :
-				signalpp::Env::purge(storage);
-				break;
-			case 's' :
-				break;
-			case 'V' :
-				signalpp::Logger::setLogLevel(signalpp::LogLevel::DEBUG);
-				break;
-			case 'h' :
-				usage(argv[0]);
-				return 0;
-			case 'v' :
-				printf("Version %s\n", signalpp::getVersion());
-				return 0;
-			default:
-				usage(argv[0]);
-				return 1;
+		if (vm.count("help"))
+		{
+			std::cout << "SignalClient - Commandline Signal client" << std::endl << std::endl << desc << std::endl;
+			return 1;
 		}
+
+		if (vm.count("version"))
+		{
+			std::cout << "Version: " << signalpp::getVersion() << std::endl;
+			return 0;
+		}
+
+		cli::notify(vm);
 	}
-#endif
+	catch (cli::error& e)
+	{
+		std::cerr << "ERROR: " << e.what() << std::endl << std::endl;
+		std::cerr << desc << std::endl;
+		return 1;
+	}
+
+
 	/* Initialize environment */
 	signalpp::Env env(&storage);
 
