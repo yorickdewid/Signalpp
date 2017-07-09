@@ -15,21 +15,24 @@ int c_callback(struct lws *wsi, enum lws_callback_reasons reason,
 	switch (reason) {
 		case LWS_CALLBACK_CLIENT_ESTABLISHED:
 			if (ws) {
-				SIGNAL_LOG_DEBUG << "Call onOpen";
+				//SIGNAL_LOG_DEBUG << "Call onOpen";
+				std::cout << "Call onOpen" << std::endl;
 				ws->callOpen();
 			}
 			break;
 
 		case LWS_CALLBACK_CLOSED:
 			if (ws) {
-				SIGNAL_LOG_DEBUG << "Call onClose";
+				//SIGNAL_LOG_DEBUG << "Call onClose";
+				std::cout << "Call onClose" << std::endl;
 				ws->callClose();
 			}
 			break;
 
 		case LWS_CALLBACK_CLIENT_RECEIVE: {
 			if (ws) {
-				SIGNAL_LOG_DEBUG << "Call onMessage";
+				//SIGNAL_LOG_DEBUG << "Call onMessage";
+				std::cout << "Call onMessage" << std::endl;
 				ws->callMessage(std::string((char *)in, len));
 			}
 			break;
@@ -37,7 +40,8 @@ int c_callback(struct lws *wsi, enum lws_callback_reasons reason,
 
 		case LWS_CALLBACK_CLIENT_CONNECTION_ERROR:
 			if (ws) {
-				SIGNAL_LOG_DEBUG << "Call onFail";
+				//SIGNAL_LOG_DEBUG << "Call onFail";
+				std::cout << "Call onFail" << std::endl;
 				ws->callFail();
 			}
 			break;

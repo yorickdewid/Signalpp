@@ -2,7 +2,7 @@
 #include <sstream>
 #include <string>
 
-#include <getopt.h>
+#include "getopt.h"
 
 #include <signalpp/signalpp.h>
 
@@ -111,6 +111,7 @@ void usage(const char *prog) {
 int main(int argc, char *argv[]) {
 	int opt= 0;
 
+#ifndef _WIN32
 	static struct option long_options[] = {
 		{"list-devices",   no_argument,       0,  'l' },
 		{"profile",        no_argument,       0,  'p' },
@@ -156,14 +157,14 @@ int main(int argc, char *argv[]) {
 				return 1;
 		}
 	}
-
+#endif
 	/* Initialize environment */
 	signalpp::Env env(&storage);
 
 	/* Register client if this first run */
-	if (!signalpp::Registration::everDone(storage)) {
+	//if (!signalpp::Registration::everDone(storage)) {
 		register_client();
-	}
+	//}
 
 	/* Initialize the client */
 	init(firstRun);

@@ -27,7 +27,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
@@ -72,18 +72,21 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>C:\Users\eve\Projects\Signalpp\libwebsockets\build\include;C:\Users\eve\Projects\Signalpp\packages\openssl.v140.windesktop.msvcstl.static.rt-dyn.x64.1.0.2.1\build\native\include;C:\Users\eve\Projects\Signalpp\libsignal-protocol-c\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp14</LanguageStandard>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
+      <AdditionalLibraryDirectories>C:\Users\eve\Projects\Signalpp\libwebsockets\build\lib\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>websockets.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -165,6 +168,10 @@
     <Import Project="..\packages\libcurl_wp8.0.0.0.2\build\native\libcurl_wp8.targets" Condition="Exists('..\packages\libcurl_wp8.0.0.0.2\build\native\libcurl_wp8.targets')" />
     <Import Project="..\packages\zlib.v140.windesktop.msvcstl.static.rt-dyn.1.2.8.8\build\native\zlib.v140.windesktop.msvcstl.static.rt-dyn.targets" Condition="Exists('..\packages\zlib.v140.windesktop.msvcstl.static.rt-dyn.1.2.8.8\build\native\zlib.v140.windesktop.msvcstl.static.rt-dyn.targets')" />
     <Import Project="..\packages\openssl.v140.windesktop.msvcstl.static.rt-dyn.x64.1.0.2.1\build\native\openssl.v140.windesktop.msvcstl.static.rt-dyn.x64.targets" Condition="Exists('..\packages\openssl.v140.windesktop.msvcstl.static.rt-dyn.x64.1.0.2.1\build\native\openssl.v140.windesktop.msvcstl.static.rt-dyn.x64.targets')" />
+    <Import Project="..\packages\protobuf-vc140.2.6.1.1\build\native\protobuf-vc140.targets" Condition="Exists('..\packages\protobuf-vc140.2.6.1.1\build\native\protobuf-vc140.targets')" />
+    <Import Project="..\packages\boost.1.59.0.0\build\native\boost.targets" Condition="Exists('..\packages\boost.1.59.0.0\build\native\boost.targets')" />
+    <Import Project="..\packages\boost_date_time-vc120.1.59.0.0\build\native\boost_date_time-vc120.targets" Condition="Exists('..\packages\boost_date_time-vc120.1.59.0.0\build\native\boost_date_time-vc120.targets')" />
+    <Import Project="..\packages\LevelDB-vc120.1.2.0.0\build\native\LevelDB-vc120.targets" Condition="Exists('..\packages\LevelDB-vc120.1.2.0.0\build\native\LevelDB-vc120.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -176,5 +183,9 @@
     <Error Condition="!Exists('..\packages\libcurl_wp8.0.0.0.2\build\native\libcurl_wp8.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\libcurl_wp8.0.0.0.2\build\native\libcurl_wp8.targets'))" />
     <Error Condition="!Exists('..\packages\zlib.v140.windesktop.msvcstl.static.rt-dyn.1.2.8.8\build\native\zlib.v140.windesktop.msvcstl.static.rt-dyn.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\zlib.v140.windesktop.msvcstl.static.rt-dyn.1.2.8.8\build\native\zlib.v140.windesktop.msvcstl.static.rt-dyn.targets'))" />
     <Error Condition="!Exists('..\packages\openssl.v140.windesktop.msvcstl.static.rt-dyn.x64.1.0.2.1\build\native\openssl.v140.windesktop.msvcstl.static.rt-dyn.x64.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\openssl.v140.windesktop.msvcstl.static.rt-dyn.x64.1.0.2.1\build\native\openssl.v140.windesktop.msvcstl.static.rt-dyn.x64.targets'))" />
+    <Error Condition="!Exists('..\packages\protobuf-vc140.2.6.1.1\build\native\protobuf-vc140.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\protobuf-vc140.2.6.1.1\build\native\protobuf-vc140.targets'))" />
+    <Error Condition="!Exists('..\packages\boost.1.59.0.0\build\native\boost.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost.1.59.0.0\build\native\boost.targets'))" />
+    <Error Condition="!Exists('..\packages\boost_date_time-vc120.1.59.0.0\build\native\boost_date_time-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_date_time-vc120.1.59.0.0\build\native\boost_date_time-vc120.targets'))" />
+    <Error Condition="!Exists('..\packages\LevelDB-vc120.1.2.0.0\build\native\LevelDB-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\LevelDB-vc120.1.2.0.0\build\native\LevelDB-vc120.targets'))" />
   </Target>
 </Project>

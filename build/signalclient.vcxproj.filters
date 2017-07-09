@@ -18,5 +18,13 @@
     <ClCompile Include="..\util\signalclient.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
+    <ClCompile Include="..\util\getopt.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\util\getopt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

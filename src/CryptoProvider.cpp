@@ -127,6 +127,7 @@ complete:
  * Symmetric encryptio/decryption routines
  */
 static const EVP_CIPHER *AESCipher(int cipher, size_t key_len) {
+#ifndef _WIN32
 	if (cipher == SG_CIPHER_AES_CBC_PKCS5) {
 		if (key_len == 16) {
 			return EVP_aes_128_cbc();
@@ -144,7 +145,17 @@ static const EVP_CIPHER *AESCipher(int cipher, size_t key_len) {
 			return EVP_aes_256_ctr();
 		}
 	}
-
+#else
+	if (key_len == 16) {
+		return EVP_aes_128_cbc();
+	}
+	else if (key_len == 24) {
+		return EVP_aes_192_cbc();
+	}
+	else if (key_len == 32) {
+		return EVP_aes_256_cbc();
+	}
+#endif
 	return 0;
 }
 

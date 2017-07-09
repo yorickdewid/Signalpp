@@ -29,7 +29,8 @@ public:
 
 		int result = session_builder_create(&m_session_builder, store_context, &m_address->address, context);
 		if (result) {
-			SIGNAL_LOG_ERROR << "session_builder_create() failed";
+			//SIGNAL_LOG_ERROR << "session_builder_create() failed";
+			std::cerr << "session_builder_create() failed" << std::endl;
 		}
 	}
 
@@ -48,7 +49,8 @@ public:
 
 		int result = curve_decode_point(&prekey_public_key, (const uint8_t *)preKeyPublicKey.data(), preKeyPublicKey.size(), context);
 		if (result) {
-			SIGNAL_LOG_ERROR << "Cannot decode public key";
+			//SIGNAL_LOG_ERROR << "Cannot decode public key";
+			std::cerr << "Cannot decode public key" << std::endl;
 			return; //TODO: throw
 		}
 
@@ -58,7 +60,8 @@ public:
 
 		result = curve_decode_point(&signed_prekey_public_key, (const uint8_t *)signedPreKeyPublicKey.data(), signedPreKeyPublicKey.size(), context);
 		if (result) {
-			SIGNAL_LOG_ERROR << "Cannot decode public key";
+			//SIGNAL_LOG_ERROR << "Cannot decode public key";
+			std::cerr << "Cannot decode public key" << std::endl;
 			return; //TODO: throw
 		}
 
@@ -71,7 +74,8 @@ public:
 
 		result = curve_decode_point(&identity_public_key, (const uint8_t *)identityKey.data(), identityKey.size(), context);
 		if (result) {
-			SIGNAL_LOG_ERROR << "Cannot decode public key";
+			//SIGNAL_LOG_ERROR << "Cannot decode public key";
+			std::cerr << "Cannot decode public key" << std::endl;
 			return; //TODO: throw
 		}
 
@@ -86,14 +90,16 @@ public:
 			signature.size(),
 			identity_public_key);
 		if (result) {
-			SIGNAL_LOG_ERROR << "session_pre_key_bundle_create() failed";
+			//SIGNAL_LOG_ERROR << "session_pre_key_bundle_create() failed";
+			std::cerr << "session_pre_key_bundle_create() failed" << std::endl;
 			return;
 		}
 
 		/* Process device pre key bundle */
 		result = session_builder_process_pre_key_bundle(m_session_builder, pre_key);
 		if (result) {
-			SIGNAL_LOG_ERROR << "session_builder_process_pre_key_bundle() failed";
+			//SIGNAL_LOG_ERROR << "session_builder_process_pre_key_bundle() failed";
+			std::cerr << "session_builder_process_pre_key_bundle() failed" << std::endl;
 			return;
 		}
 
@@ -124,14 +130,16 @@ public:
 	std::pair<std::string, int> encryptToDevice(std::string plaintext) {
 		int result = session_cipher_create(&m_session_cipher, store_context, &m_address->address, context);
 		if (result) {
-			SIGNAL_LOG_ERROR << "session_cipher_create() failed";
+			//SIGNAL_LOG_ERROR << "session_cipher_create() failed";
+			std::cerr << "session_cipher_create() failed" << std::endl;
 			return std::make_pair("", 0);//TODO: throw
 		}
 
 		ciphertext_message *ciphertext = nullptr;
 		result = session_cipher_encrypt(m_session_cipher, (uint8_t *)plaintext.data(), plaintext.size(), &ciphertext);
 		if (result) {
-			SIGNAL_LOG_ERROR << "session_cipher_encrypt() failed";
+			//SIGNAL_LOG_ERROR << "session_cipher_encrypt() failed";
+			std::cerr << "session_cipher_encrypt() failed" << std::endl;
 			return std::make_pair("", 0);//TODO: throw
 		}
 

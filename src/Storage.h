@@ -1,8 +1,6 @@
 #ifndef _STORAGE_H_
 #define _STORAGE_H_
 
-#include <leveldb/db.h>
-
 #include <memory>
 #include <iostream>
 
@@ -25,19 +23,19 @@ class StorageContainer {
 };
 
 class Ldb : public StorageContainer {
-	leveldb::DB* m_db;
-	leveldb::Options m_options;
+	//leveldb::DB* m_db;
+	//leveldb::Options m_options;
 
   public:
 	Ldb(const std::string& name) {
-	    m_options.create_if_missing = true;
+	    //m_options.create_if_missing = true;
 		
-		leveldb::Status status = leveldb::DB::Open(m_options, name, &m_db);
+		//leveldb::Status status = leveldb::DB::Open(m_options, name, &m_db);
 
-		if (!status.ok()) {
-			std::cerr << "Unable to open/create database " << name << std::endl;
-			std::cerr << status.ToString() << std::endl;
-		}
+		//if (!status.ok()) {
+		//	std::cerr << "Unable to open/create database " << name << std::endl;
+		//	std::cerr << status.ToString() << std::endl;
+		//}
 	}
 
 	~Ldb() {
@@ -45,36 +43,38 @@ class Ldb : public StorageContainer {
 	}
 
 	void put(const std::string& key, const std::string& value) {
-		m_db->Put(leveldb::WriteOptions(), key, value);
+		//m_db->Put(leveldb::WriteOptions(), key, value);
 	}
 
 	void put(const std::string& key, int intValue) {
-		leveldb::Slice value((char *)&intValue, sizeof(int));
+		//leveldb::Slice value((char *)&intValue, sizeof(int));
 
-		m_db->Put(leveldb::WriteOptions(), key, value);
+		//m_db->Put(leveldb::WriteOptions(), key, value);
 	}
 
 	bool get(const std::string& key, std::string& value) {
-		leveldb::Status status = m_db->Get(leveldb::ReadOptions(), key, &value);
-		return status.ok();
+		//leveldb::Status status = m_db->Get(leveldb::ReadOptions(), key, &value);
+		//return status.ok();]
+		return true;
 	}
 
 	bool get(const std::string& key, int& intValue) {
-		std::string value;
+		//std::string value;
 
-		leveldb::Status status = m_db->Get(leveldb::ReadOptions(), key, &value);
+		//leveldb::Status status = m_db->Get(leveldb::ReadOptions(), key, &value);
 
-		intValue = (uint8_t)value[3] << 24 | (uint8_t)value[2] << 16 | (uint8_t)value[1] << 8 | (uint8_t)value[0];
+		//intValue = (uint8_t)value[3] << 24 | (uint8_t)value[2] << 16 | (uint8_t)value[1] << 8 | (uint8_t)value[0];
 
-		return status.ok();
+		//return status.ok();
+		return true;
 	}
 
 	void purge(const std::string& key) {
-		m_db->Delete(leveldb::WriteOptions(), key);
+		//m_db->Delete(leveldb::WriteOptions(), key);
 	}
 	
 	void close() {
-		delete m_db;
+		//delete m_db;
 	}
 
 	void flush() {}

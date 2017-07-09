@@ -84,13 +84,16 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\eve\Projects\Signalpp\include;C:\Users\eve\Projects\Signalpp\libwebsockets\build\include;C:\Users\eve\Projects\Signalpp\packages\openssl.v140.windesktop.msvcstl.static.rt-dyn.x64.1.0.2.1\build\native\include;C:\Users\eve\Projects\Signalpp\libsignal-protocol-c\src;C:\Users\eve\Projects\Signalpp\packages\protobuf.2.6.1.1\build\native\include;C:\Users\eve\Projects\Signalpp\packages\leveldb-vc140.1.16.0.5\build\native\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
+      <AdditionalLibraryDirectories>C:\Users\eve\Projects\Signalpp\packages\leveldb-vc140.1.16.0.5\build\native\bin\Debug;C:\Users\eve\Projects\Signalpp\libsignal-protocol-c\build\src\Debug;C:\Users\eve\Projects\Signalpp\libwebsockets\build\lib\Debug;C:\Users\eve\Projects\Signalpp\packages\libcurl_wp8.0.0.0.2\build\native\lib\Win32\v110\Debug;C:\Users\eve\Projects\Signalpp\packages\openssl.v140.windesktop.msvcstl.static.rt-dyn.x64.1.0.2.1\lib\native\v140\windesktop\msvcstl\static\rt-dyn\x64\debug;C:\Users\eve\Projects\Signalpp\packages\protobuf-vc140.2.6.1.1\build\native\lib\Win32\v140\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>signal-protocol-c.lib;websockets.lib;zlib_internal.lib;libcurl.lib;libeay32.lib;ssleay32.lib;libprotobuf.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -135,7 +138,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\util\getopt.cpp" />
     <ClCompile Include="..\util\signalclient.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\util\getopt.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="libsignal++.vcxproj">
+      <Project>{cbf5d013-1cd0-4f61-bd4b-9376d894068b}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

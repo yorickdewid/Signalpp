@@ -27,7 +27,7 @@ struct IncomingWebSocketRequest {
 			// id = random 2 byte
 		}
 
-		SIGNAL_LOG_DEBUG << "IncomingWebSocketRequest:";
+		std::cout << "IncomingWebSocketRequest:" << std::endl;
 		SIGNAL_LOG_DEBUG << " verb: " << verb;
 		SIGNAL_LOG_DEBUG << " path: " << path;
 		SIGNAL_LOG_DEBUG << " body sz: " << body.size();
@@ -91,7 +91,7 @@ class WebSocketResource {
             //     throw 'Received response for unknown request ' + response.id();
             // }
         } else {
-        	SIGNAL_LOG_WARNING << "Invalid websocket request";
+			std::cout << "Invalid websocket request" << std::endl;
         }
 	};
 
