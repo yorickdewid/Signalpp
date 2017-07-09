@@ -120,7 +120,7 @@ void AccountManager::createAccount(const std::string& number,
 }
 
 prekey::result AccountManager::generateKeys(size_t count) {
-	SIGNAL_LOG_INFO << "Generate prekeys";
+	std::cout << "Generate prekeys" << std::endl;
 
 	KeyHelper keyHelper;
 	prekey::result result;

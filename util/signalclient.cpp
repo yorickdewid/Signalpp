@@ -111,7 +111,7 @@ int main(int argc, char *argv[]) {
 
 		if (vm.count("help"))
 		{
-			std::cout << "SignalClient - Commandline Signal client" << std::endl << std::endl << desc << std::endl;
+			std::cout << CLIENT_NAME " - Commandline Signal client" << std::endl << std::endl << desc << std::endl;
 			return 1;
 		}
 

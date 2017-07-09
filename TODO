@@ -1,0 +1,3 @@
+- Move to CMAKE
+- Rewrite libwebsockets with boost::asio
+- Boost logging
