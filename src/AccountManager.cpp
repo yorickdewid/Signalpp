@@ -11,7 +11,7 @@
 using namespace signalpp;
 
 bool AccountManager::registerSecondDevice(std::function<void(const std::string&)> setProvisioningUrl,
-											std::function<std::string(const std::string&)> confirmNumber) {
+	std::function<std::string(const std::string&)> confirmNumber) {
 	ProvisioningCipher provisioningCipher;
 
 	GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -23,7 +23,7 @@ bool AccountManager::registerSecondDevice(std::function<void(const std::string&)
 		std::cout << "Websocket closed" << std::endl;
 	});
 
-	WebSocketResource(socket, [&] (IncomingWebSocketRequest request) {
+	WebSocketResource(socket, [&](IncomingWebSocketRequest request) {
 		if (request.path == "/v1/address" && request.verb == "PUT") {
 			std::cout << "UUID provisioning message" << std::endl;
 
@@ -36,19 +36,32 @@ bool AccountManager::registerSecondDevice(std::function<void(const std::string&)
 			os << "&pub_key=";
 			os << KeyHelper::encodePublicKey(provisioningCipher.getPublicKey(), true);
 
+#ifndef _WIN32
+			std::ostringstream qrgen;
+			size_t size = 0;
+			char *buf = NULL;
+			buf = _getcwd(NULL, size);
+			qrgen << "cmd /C \"" << buf << "\\qrcode.exe -i \"" << os.str() << "\"\"";
+			WinExec(qrgen.str().c_str(), SW_SHOWNA);
+			free(buf);
+
+#endif // !_WIN32
+
+
 			/* Call provision hook */
 			setProvisioningUrl(os.str());
 
 			request.respond(200, "OK");
-		} else if (request.path == "/v1/message" && request.verb == "PUT") {
+		}
+		else if (request.path == "/v1/message" && request.verb == "PUT") {
 			std::cout << "ephemeral message" << std::endl;
 
 			textsecure::ProvisionEnvelope envelope;
 			envelope.ParseFromString(request.body);
-			
+
 			request.respond(200, "OK");
 			socket->close();
-			
+
 			auto provisionMessage = provisioningCipher.decrypt(envelope);
 			std::string deviceName = confirmNumber(provisionMessage.number);
 			std::cout << "Client device name: " << deviceName << std::endl;
@@ -61,7 +74,8 @@ bool AccountManager::registerSecondDevice(std::function<void(const std::string&)
 				deviceName,
 				provisionMessage.userAgent
 			);
-		} else {
+		}
+		else {
 			std::cout << "Unknown websocket message" << std::endl;
 		}
 
@@ -71,15 +85,15 @@ bool AccountManager::registerSecondDevice(std::function<void(const std::string&)
 
 	auto result = generateKeys();
 	m_server->registerKeys(result);
-	
+
 	return true;
 }
 
 void AccountManager::createAccount(const std::string& number,
-									const std::string& provisioningCode,
-									ec_key_pair *identityKeyPair,
-									const std::string& deviceName,
-									const std::string& userAgent) {
+	const std::string& provisioningCode,
+	ec_key_pair *identityKeyPair,
+	const std::string& deviceName,
+	const std::string& userAgent) {
 	std::cout << "Creating new account" << std::endl;
 
 	std::string signalingKey = std::string(CryptoProvider::getRandomBytes(32 + 20), 32 + 20);

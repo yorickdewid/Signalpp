@@ -34,4 +34,9 @@
 build/Debug/
 .vs/
 packages/
+
+# other
 *.tlog
+*.nupkg
+*.png
+Debug

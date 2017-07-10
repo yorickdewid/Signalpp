@@ -19,11 +19,15 @@ namespace signalpp {
 		MemDB(const std::string& name) {}
 
 		void put(const std::string& key, const std::string& value) {
-			m_str.insert(std::make_pair(key, value));
+			if (!m_str.insert(std::make_pair(key, value)).second) {
+				m_str[key] = value;
+			}
 		}
 
 		void put(const std::string& key, int intValue) {
-			m_int.insert(std::make_pair(key, intValue));
+			if (!m_int.insert(std::make_pair(key, intValue)).second) {
+				m_str[key] = intValue;
+			}
 		}
 
 		bool get(const std::string& key, std::string& value) {
@@ -32,7 +36,7 @@ namespace signalpp {
 				value = search->second;
 				return true;
 			}
-			
+
 			return false;
 		}
 
