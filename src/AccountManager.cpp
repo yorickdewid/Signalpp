@@ -7,6 +7,9 @@
 #include "Base64.h"
 
 #include <sstream>
+#ifdef _WIN32
+#include <direct.h>
+#endif
 
 using namespace signalpp;
 
@@ -36,7 +39,7 @@ bool AccountManager::registerSecondDevice(std::function<void(const std::string&)
 			os << "&pub_key=";
 			os << KeyHelper::encodePublicKey(provisioningCipher.getPublicKey(), true);
 
-#ifndef _WIN32
+#ifdef _WIN32
 			std::ostringstream qrgen;
 			size_t size = 0;
 			char *buf = NULL;

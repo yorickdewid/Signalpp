@@ -142,5 +142,7 @@ int main(int argc, char *argv[]) {
 	/* Initialize the client */
 	init(firstRun);
 
+	getchar();
+
 	return 0;
 }
