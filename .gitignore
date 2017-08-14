@@ -40,3 +40,7 @@ packages/
 *.nupkg
 *.png
 Debug
+*.log
+*.dat
+*.key
+*.pdb

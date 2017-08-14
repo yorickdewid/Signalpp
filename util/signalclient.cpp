@@ -7,7 +7,7 @@
 
 #define CLIENT_NAME		"SignalClient++"
 
-signalpp::Storage<signalpp::MemDB> storage("db");
+signalpp::Storage<signalpp::NuDB> storage("db");
 bool firstRun = false;
 
 void init(bool firstRun = false) {
