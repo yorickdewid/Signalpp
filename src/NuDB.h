@@ -102,6 +102,10 @@ namespace signalpp {
 			initialize(key);
 		}
 
+		void commit() {
+
+		}
+
 		void close() {
 			if (!m_db_closed) {
 				boost::system::error_code ec;

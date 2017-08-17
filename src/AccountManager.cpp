@@ -129,6 +129,7 @@ void AccountManager::createAccount(const std::string& number,
 	}
 
 	m_server->setUsername(number_id);
+	m_storage->commit();
 }
 
 prekey::result AccountManager::generateKeys(size_t count) {

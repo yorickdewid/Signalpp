@@ -17,16 +17,15 @@ class Env {
 	void init() {
 		std::cout << "Initialize environment" << std::endl;
 
-		// does not work that way in NuDB
-		//if (!signalpp::Registration::isDone(*m_storage)) {
-		//	m_storage->put("startcount", 0);
+		if (!signalpp::Registration::isDone(*m_storage)) {
+			m_storage->put("startcount", 0);
 
-		//	m_storage->put("username", "");
-		//	m_storage->put("password", "");
+			m_storage->put("username", "");
+			m_storage->put("password", "");
 
-		//	m_storage->put("maxPreKeyId", 1);
-		//	m_storage->put("signedKeyId", 1);
-		//}
+			m_storage->put("maxPreKeyId", 1);
+			m_storage->put("signedKeyId", 1);
+		}
 	}
 
 public:

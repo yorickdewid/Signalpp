@@ -57,6 +57,7 @@ void for_each(signalpp::Storage<signalpp::NuDB>& storage)
 	//storage.open(dp, kp, lp, ec);
 }
 
+
 TEST_CASE("UnqliteDB tests") {
 	signalpp::Storage<signalpp::UnqliteDB> storage("testdb");
 	SECTION("Database Insert And Retrieve Integer") {
@@ -69,6 +70,41 @@ TEST_CASE("UnqliteDB tests") {
 		std::string value = put_and_verify<signalpp::UnqliteDB,std::string>(storage, "identityKey", expected);
 		//printf_s(value.c_str());
 		//printf_s(expected.c_str());
+		REQUIRE(strcmp(value.c_str(), expected.c_str()) == 0);
+	}
+	SECTION("signalingKey") {
+		std::string expected = "&í∂¯≈…9Î˝ñ\x12x[¿¨Ï¬Î1A∞ \x1b¨M\x1¢©C¶È®’’—º\x15ôƒ˜¨\n’\r H÷íÔù€";
+		std::string value = put_and_verify<signalpp::UnqliteDB, std::string>(storage, "signalingKey", expected);
+		REQUIRE(strcmp(value.c_str(), expected.c_str()) == 0);
+	}
+	SECTION("password") {
+		std::string expected = "mSx/ayeZOe3AOKohzG+wrA";
+		std::string value = put_and_verify<signalpp::UnqliteDB, std::string>(storage, "password", expected);
+		REQUIRE(strcmp(value.c_str(), expected.c_str()) == 0);
+	}
+	SECTION("registrationId") {
+		std::string expected = "12800";
+		std::string value = put_and_verify<signalpp::UnqliteDB, std::string>(storage, "registrationId", expected);
+		REQUIRE(strcmp(value.c_str(), expected.c_str()) == 0);
+	}
+	SECTION("number") {
+		std::string expected = "+31622222222";
+		std::string value = put_and_verify<signalpp::UnqliteDB, std::string>(storage, "number", expected);
+		REQUIRE(strcmp(value.c_str(), expected.c_str()) == 0);
+	}
+	SECTION("number_id") {
+		std::string expected = "+31622222222.2";
+		std::string value = put_and_verify<signalpp::UnqliteDB, std::string>(storage, "number_id", expected);
+		REQUIRE(strcmp(value.c_str(), expected.c_str()) == 0);
+	}
+	SECTION("deviceName") {
+		std::string expected = "SignalClient++";
+		std::string value = put_and_verify<signalpp::UnqliteDB, std::string>(storage, "deviceName", expected);
+		REQUIRE(strcmp(value.c_str(), expected.c_str()) == 0);
+	}
+	SECTION("deviceId") {
+		std::string expected = "2";
+		std::string value = put_and_verify<signalpp::UnqliteDB, std::string>(storage, "deviceId", expected);
 		REQUIRE(strcmp(value.c_str(), expected.c_str()) == 0);
 	}
 	storage.close();

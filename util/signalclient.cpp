@@ -7,7 +7,7 @@
 
 #define CLIENT_NAME		"SignalClient++"
 
-signalpp::Storage<signalpp::NuDB> storage("db");
+signalpp::Storage<signalpp::UnqliteDB> storage("db");
 bool firstRun = false;
 
 void init(bool firstRun = false) {
@@ -96,28 +96,6 @@ void register_client() {
 	firstRun = true;
 }
 
-void for_each(signalpp::Storage<signalpp::NuDB>& storage)
-{
-	//auto const appnum = db_.appnum();
-	nudb::error_code ec;
-	storage.close();
-
-	nudb::visit("db.dat",
-		[&](
-			void const* key, std::size_t key_bytes,
-			void const* data, std::size_t size,
-			nudb::error_code&)
-	{
-
-		std::string key_s((char const*)key, key_bytes);
-		std::string ret((char const*)data, size);
-		nudb::detail::buffer bf;
-		printf_s(("Key: " + key_s + "\n").c_str());
-		printf_s(("Data: " + ret + "\n").c_str());
-
-	}, nudb::no_progress{}, ec);
-}
-
 
 int main(int argc, char *argv[]) {
 	namespace cli = boost::program_options;
@@ -164,26 +142,12 @@ int main(int argc, char *argv[]) {
 		register_client();
 	}
 
-	for_each(storage);
-	storage = signalpp::Storage<signalpp::NuDB>("db");
-	//storage.initialize("db");
 	std::string IdentityKey;
-	//std::string SignalingKey;
-	//std::string PasswordKey;
-	//std::string RegistrationKey;
-	//std::string NumberKey;
-	//std::string NumberIdKey;
-	//std::string DevicenameKey;
-	//std::string DeviceIdKey;
+	/* Key Not found, both NuDB and Unqlite db have this problem, so it's our code somehow.
+		Relative db path was not the issue.
+		Uncommited values also was not.
+	*/
 	storage.get("identityKey", IdentityKey);
-	////printf_s(serialize.c_str());
-	//storage.get("signaling_key", SignalingKey); // works
-	//storage.get("password", PasswordKey); // breaks?
-	//storage.get("registrationId", RegistrationKey);
-	//storage.get("number", NumberKey);
-	//storage.get("number_id", NumberIdKey);
-	//storage.get("device_name", DevicenameKey);
-	//storage.get("device_id", DeviceIdKey);
 
 	/* Initialize the client */
 	init(firstRun);

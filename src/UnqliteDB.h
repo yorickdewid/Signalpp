@@ -18,7 +18,7 @@ namespace signalpp {
 		}
 
 		void initialize(const std::string& name) {
-			int rc = unqlite_open(&m_db, (name + std::string(".udb")).c_str(), UNQLITE_OPEN_CREATE);
+			int rc = unqlite_open(&m_db, (std::string("..\\Debug\\") + name + std::string(".udb")).c_str(), UNQLITE_OPEN_CREATE);
 			if (rc != UNQLITE_OK) { return; }
 		}
 
@@ -52,7 +52,11 @@ namespace signalpp {
 		bool get(const std::string& key, std::string& value) {
 			unqlite_int64 nBytes; // -1 gives different behavior
 			int rc = -1;
-			rc = unqlite_kv_fetch(m_db, key.c_str(), -1, NULL, &nBytes);
+			rc = unqlite_kv_fetch(m_db, key.c_str(), sizeof(key), NULL, &nBytes);
+			if (rc == UNQLITE_NOTFOUND) { // -6
+				printf_s("key does not exist");
+				return false;
+			}
 			void* buffer = malloc(nBytes);
 			rc = unqlite_kv_fetch(m_db, key.c_str(), sizeof(key), buffer, &nBytes);
 			std::string ret((char const*)buffer, nBytes);
@@ -78,6 +82,10 @@ namespace signalpp {
 				return false;
 			}
 			return true;
+		}
+
+		void commit() {
+			unqlite_commit(m_db);
 		}
 
 		void purge(const std::string& key) {

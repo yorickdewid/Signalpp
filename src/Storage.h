@@ -15,6 +15,7 @@ class StorageContainer {
     virtual bool get(const std::string& key, std::string& value) = 0;
     virtual bool get(const std::string& key, int& value) = 0;
     virtual void purge(const std::string& key) = 0;
+	virtual void commit() = 0;
     virtual void close() = 0;
     virtual void flush() = 0;
 
@@ -53,6 +54,10 @@ class Storage : public StorageContainer {
 
 	inline void purge(const std::string& key) {
 		m_db->purge(key);
+	}
+
+	inline void commit() {
+		m_db->commit();
 	}
 	
 	inline void close() {
