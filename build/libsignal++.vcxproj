@@ -78,8 +78,10 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\packages\boost.1.64.0.0\lib\native\include;..\NuDb\include;..\libwebsockets\build\include;..\packages\openssl.v140.windesktop.msvcstl.static.rt-dyn.x64.1.0.2.1\build\native\include;..\libsignal-protocol-c\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\unqlite;..\packages\boost.1.64.0.0\lib\native\include;..\NuDb\include;..\libwebsockets\build\include;..\packages\openssl.v140.windesktop.msvcstl.static.rt-dyn.x64.1.0.2.1\build\native\include;..\libsignal-protocol-c\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <BufferSecurityCheck>false</BufferSecurityCheck>
+      <LanguageStandard>
+      </LanguageStandard>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
@@ -151,6 +153,7 @@
     <ClInclude Include="..\src\SessionCipher.h" />
     <ClInclude Include="..\src\Storage.h" />
     <ClInclude Include="..\src\SyncRequest.h" />
+    <ClInclude Include="..\src\UnqliteDB.h" />
     <ClInclude Include="..\src\Websocket.h" />
     <ClInclude Include="..\src\WebSocketProtocol.pb.h" />
     <ClInclude Include="..\src\WebsocketResource.h" />

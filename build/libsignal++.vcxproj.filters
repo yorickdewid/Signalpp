@@ -116,6 +116,9 @@
     <ClInclude Include="..\src\NuDB.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\UnqliteDB.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\AccountManager.cpp">

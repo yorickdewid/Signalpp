@@ -14,7 +14,11 @@ static void markDone(StorageContainer& storage) {
 
 static bool isDone(StorageContainer& storage) {
 	int _ph = 0;
-	return storage.get("RegistrationDone", _ph);
+	char buffer[30];
+	bool result = storage.get("RegistrationDone", _ph);
+	sprintf(buffer, "length: %i", _ph);
+	printf_s(buffer);
+	return result;
 }
 
 static bool everDone(StorageContainer& storage) {

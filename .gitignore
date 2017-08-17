@@ -44,3 +44,5 @@ Debug
 *.dat
 *.key
 *.pdb
+vars.txt
+*.udb

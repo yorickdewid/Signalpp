@@ -12,6 +12,7 @@
 #include "../../src/LevelDB.h"
 #include "../../src/MemDB.h"
 #include "../../src/NuDB.h"
+#include "../../src/UnqliteDB.h"
 #include "../../src/Registration.h"
 #include "../../src/ProvisioningCipher.h"
 #include "../../src/Api.h"

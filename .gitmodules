@@ -11,3 +11,6 @@
 [submodule "NuDb"]
 	path = NuDb
 	url = https://github.com/vinniefalco/NuDB.git
+[submodule "unqlite"]
+	path = unqlite
+	url = https://github.com/symisc/unqlite.git

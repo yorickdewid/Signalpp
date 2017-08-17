@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "signalclient", "build\signa
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DbTest", "DbTest\DbTest.vcxproj", "{004CF821-6487-47BA-BFE2-3AC0EB40617E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Unqlite", "unqlite_msvs\Unqlite.vcxproj", "{F5423349-6494-45C3-AC1E-D482ABB63E8D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -41,6 +43,14 @@ Global
 		{004CF821-6487-47BA-BFE2-3AC0EB40617E}.Release|x64.Build.0 = Release|x64
 		{004CF821-6487-47BA-BFE2-3AC0EB40617E}.Release|x86.ActiveCfg = Release|Win32
 		{004CF821-6487-47BA-BFE2-3AC0EB40617E}.Release|x86.Build.0 = Release|Win32
+		{F5423349-6494-45C3-AC1E-D482ABB63E8D}.Debug|x64.ActiveCfg = Debug|x64
+		{F5423349-6494-45C3-AC1E-D482ABB63E8D}.Debug|x64.Build.0 = Debug|x64
+		{F5423349-6494-45C3-AC1E-D482ABB63E8D}.Debug|x86.ActiveCfg = Debug|Win32
+		{F5423349-6494-45C3-AC1E-D482ABB63E8D}.Debug|x86.Build.0 = Debug|Win32
+		{F5423349-6494-45C3-AC1E-D482ABB63E8D}.Release|x64.ActiveCfg = Release|x64
+		{F5423349-6494-45C3-AC1E-D482ABB63E8D}.Release|x64.Build.0 = Release|x64
+		{F5423349-6494-45C3-AC1E-D482ABB63E8D}.Release|x86.ActiveCfg = Release|Win32
+		{F5423349-6494-45C3-AC1E-D482ABB63E8D}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

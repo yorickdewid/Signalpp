@@ -7,6 +7,9 @@
 
 using namespace signalpp;
 
+
+// MISSING generateIdentityKey for primary device
+
 const short KeyHelper::generateRegistrationId() {
 	unsigned char *randId = (unsigned char *)CryptoProvider::getRandomBytes(1);
 	unsigned short int registrationId = (short)(((unsigned char)*randId) << 8);
