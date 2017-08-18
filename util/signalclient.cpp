@@ -7,7 +7,7 @@
 
 #define CLIENT_NAME		"SignalClient++"
 
-signalpp::Storage<signalpp::UnqliteDB> storage("db");
+std::shared_ptr<signalpp::StorageContainer> storage = std::make_shared<signalpp::Storage<signalpp::UnqliteDB>>("db");
 bool firstRun = false;
 
 void init(bool firstRun = false) {
@@ -18,15 +18,15 @@ void init(bool firstRun = false) {
 	std::cout << "Starting init" << std::endl;
 
 	std::string username, password, signalingKey;
-	storage.get("number_id", username); // key not found error.
-	storage.get("password", password);
-	storage.get("signaling_key", signalingKey);
+	storage->get("number_id", username);
+	storage->get("password", password);
+	storage->get("signaling_key", signalingKey);
 
 	std::cout << "username: " << username << std::endl;
 	std::cout << "password: " << password << std::endl;
 
 	/* Initialize the socket and start listening for messages */
-	signalpp::MessageReceiver messageReceiver(&storage,
+	signalpp::MessageReceiver messageReceiver(storage,
 		signalpp::serverUrl,
 		signalpp::serverPorts,
 		username, password, signalingKey,
@@ -41,7 +41,7 @@ void init(bool firstRun = false) {
 	messageReceiver.onRead([] {});
 	messageReceiver.onError([] {});
 
-	signalpp::MessageSender messageSender(&storage,
+	signalpp::MessageSender messageSender(storage,
 		signalpp::serverUrl,
 		signalpp::serverPorts,
 		username, password, signalingKey,
@@ -49,7 +49,7 @@ void init(bool firstRun = false) {
 
 	// if (firstRun) {
 	int device_id = 0;
-	if (!storage.get("device_id", device_id))
+	if (!storage->get("device_id", device_id))
 		return;
 	if (!device_id || device_id == 1)
 		return;
@@ -60,7 +60,7 @@ void init(bool firstRun = false) {
 
 	syncRequest.onSuccess([&syncRequest]() {
 		std::cout << "Sync successful" << std::endl;
-		storage.put("synced_at", signalpp::getTimestamp());
+		storage->put("synced_at", signalpp::getTimestamp());
 		syncRequest.onContactSyncComplete();
 	});
 
@@ -73,10 +73,10 @@ void init(bool firstRun = false) {
 
 void register_client() {
 	std::string username, password;
-	storage.get("username", username);
-	storage.get("password", password);
+	storage->get("username", username);
+	storage->get("password", password);
 
-	signalpp::AccountManager accountManager(&storage, signalpp::serverUrl, signalpp::serverPorts, username, password);
+	signalpp::AccountManager accountManager(storage, signalpp::serverUrl, signalpp::serverPorts, username, password);
 
 	/* For the moment just show the URL */
 	auto provisionUrl = [](const std::string& url) {
@@ -135,7 +135,7 @@ int main(int argc, char *argv[]) {
 
 
 	/* Initialize environment */
-	signalpp::Env env(&storage);
+	signalpp::Env env(storage); //weirdly enough this branches off accountmanager
 
 	/* Register client if this first run */
 	if (!signalpp::Registration::everDone(storage)) {
@@ -147,7 +147,8 @@ int main(int argc, char *argv[]) {
 		Relative db path was not the issue.
 		Uncommited values also was not.
 	*/
-	storage.get("identityKey", IdentityKey);
+	storage->commit();
+	storage->get("identityKey", IdentityKey);
 
 	/* Initialize the client */
 	init(firstRun);

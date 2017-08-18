@@ -7,29 +7,29 @@ namespace signalpp {
 
 namespace Registration {
 
-static void markDone(StorageContainer& storage) {
-	storage.put("RegistrationDoneEver", 1);
-	storage.put("RegistrationDone", 1);
+static void markDone(std::shared_ptr<signalpp::StorageContainer> storage) {
+	storage->put("RegistrationDoneEver", 1);
+	storage->put("RegistrationDone", 1);
 }
 
-static bool isDone(StorageContainer& storage) {
+static bool isDone(std::shared_ptr<signalpp::StorageContainer> storage) {
 	int _ph = 0;
 	char buffer[30];
-	bool result = storage.get("RegistrationDone", _ph);
+	bool result = storage->get("RegistrationDone", _ph);
 	sprintf(buffer, "length: %i", _ph);
 	printf_s(buffer);
 	return result;
 }
 
-static bool everDone(StorageContainer& storage) {
+static bool everDone(std::shared_ptr<signalpp::StorageContainer> storage) {
 	int _ph = 0;
-	return storage.get("RegistrationDoneEver", _ph)
-		&& storage.get("RegistrationDone", _ph);
+	return storage->get("RegistrationDoneEver", _ph)
+		&& storage->get("RegistrationDone", _ph);
 }
 
-static void remove(StorageContainer& storage) {
-	storage.purge("RegistrationDoneEver");
-	storage.purge("RegistrationDone");
+static void remove(std::shared_ptr<signalpp::StorageContainer> storage) {
+	storage->purge("RegistrationDoneEver");
+	storage->purge("RegistrationDone");
 }
 
 } // namespace Registration

@@ -12,13 +12,13 @@ namespace signalpp {
 
 class MessageReceiver {
 	std::unique_ptr<TextSecureServer> m_server;
-	StorageContainer *m_storage = nullptr;
+	std::shared_ptr<signalpp::StorageContainer> m_storage = nullptr;
 	Websocket *m_socket = nullptr;
 
 	void connect();
 
 public:
-	MessageReceiver(class StorageContainer *storage,
+	MessageReceiver(std::shared_ptr<signalpp::StorageContainer> storage,
 						const std::string& url,
 						const unsigned short ports[],
 						const std::string& username,

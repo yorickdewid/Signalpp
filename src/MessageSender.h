@@ -13,10 +13,10 @@ namespace signalpp {
 
 class MessageSender {
 	std::shared_ptr<TextSecureServer> m_server;
-	StorageContainer *m_storage = nullptr;
+	std::shared_ptr<signalpp::StorageContainer> m_storage = nullptr;
 
 public:
-	MessageSender(class StorageContainer *storage,
+	MessageSender(std::shared_ptr<signalpp::StorageContainer> storage,
 						const std::string& url,
 						const unsigned short ports[],
 						const std::string& username,

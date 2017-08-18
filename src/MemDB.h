@@ -52,6 +52,8 @@ namespace signalpp {
 
 		void purge(const std::string& key) { }
 
+		void commit(){}
+
 		void close() {}
 
 		void flush() {}

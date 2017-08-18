@@ -12,12 +12,12 @@
 namespace signalpp {
 
 class Env {
-	StorageContainer *m_storage = nullptr;
+	std::shared_ptr<signalpp::StorageContainer> m_storage = nullptr;
 
 	void init() {
 		std::cout << "Initialize environment" << std::endl;
 
-		if (!signalpp::Registration::isDone(*m_storage)) {
+		if (!signalpp::Registration::isDone(m_storage)) {
 			m_storage->put("startcount", 0);
 
 			m_storage->put("username", "");
@@ -29,23 +29,23 @@ class Env {
 	}
 
 public:
-	Env(class StorageContainer *storage)
+	Env(std::shared_ptr<signalpp::StorageContainer> storage)
 	: m_storage(storage) {
 		init();
 	}
 
-	static void purge(class StorageContainer& storage) {
+	static void purge(std::shared_ptr<signalpp::StorageContainer> storage) {
 		signalpp::Registration::remove(storage);
 
-		storage.purge("identityKey");
-		storage.purge("signaling_key");
-		storage.purge("password");
-		storage.purge("registrationId");
-		storage.purge("number");
-		storage.purge("number_id");
-		storage.purge("device_name");
-		storage.purge("device_id");
-		storage.purge("userAgent");
+		storage->purge("identityKey");
+		storage->purge("signaling_key");
+		storage->purge("password");
+		storage->purge("registrationId");
+		storage->purge("number");
+		storage->purge("number_id");
+		storage->purge("device_name");
+		storage->purge("device_id");
+		storage->purge("userAgent");
 	}
 };
 

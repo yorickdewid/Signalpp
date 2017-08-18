@@ -14,8 +14,6 @@
 namespace signalpp {
 
 class OutgoingMessage {
-	// std::unique_ptr<TextSecureServer> m_server;
-	// StorageContainer *m_storage = nullptr;
 	std::shared_ptr<TextSecureServer> m_server;
 	// SignalProtocolStore protocol;
 	std::vector<std::string> successfulNumbers;

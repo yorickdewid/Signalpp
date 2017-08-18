@@ -113,7 +113,15 @@ void AccountManager::createAccount(const std::string& number,
 	std::string number_id = number + "." + std::to_string(deviceId);
 	std::cout << "number_id: " << number_id << std::endl;
 
-	m_storage->purge("db");
+	m_storage->purge("identityKey");
+	m_storage->purge("signaling_key");
+	m_storage->purge("password");
+	m_storage->purge("registrationId");
+	m_storage->purge("number");
+	m_storage->purge("number_id");
+	m_storage->purge("device_name");
+	m_storage->purge("device_id");
+	m_storage->purge("userAgent");
 
 	std::string serialize = KeyHelper::serializeKeyPair(identityKeyPair);
 	m_storage->put("identityKey", serialize);
@@ -128,8 +136,9 @@ void AccountManager::createAccount(const std::string& number,
 		m_storage->put("userAgent", userAgent);
 	}
 
+	// this works fine in memory, when you call commit it gets written away.
+
 	m_server->setUsername(number_id);
-	m_storage->commit();
 }
 
 prekey::result AccountManager::generateKeys(size_t count) {

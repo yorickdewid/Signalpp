@@ -23,7 +23,7 @@ class StorageContainer {
 
 template<class T>
 class Storage : public StorageContainer {
-	std::unique_ptr<StorageContainer> m_db;
+	std::unique_ptr<StorageContainer> m_db = nullptr;
 
   public:
 	Storage(const std::string& name)

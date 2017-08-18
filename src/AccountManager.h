@@ -14,10 +14,10 @@ namespace signalpp {
 
 class AccountManager {
 	std::unique_ptr<TextSecureServer> m_server;
-	StorageContainer *m_storage = nullptr;
+	std::shared_ptr<signalpp::StorageContainer> m_storage = nullptr;
 
 public:
-    AccountManager(class StorageContainer *storage,
+    AccountManager(std::shared_ptr<signalpp::StorageContainer> storage,
     					const std::string& url,
 						const unsigned short ports[],
 						const std::string& username,

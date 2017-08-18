@@ -18,8 +18,15 @@ namespace signalpp {
 		}
 
 		void initialize(const std::string& name) {
-			int rc = unqlite_open(&m_db, (std::string("..\\Debug\\") + name + std::string(".udb")).c_str(), UNQLITE_OPEN_CREATE);
-			if (rc != UNQLITE_OK) { return; }
+			std::string file_name = std::string("C:\\") + name + std::string(".udb");
+			if (!is_file_exist(file_name.c_str())) {
+				int rc = unqlite_open(&m_db, file_name.c_str(), UNQLITE_OPEN_CREATE);
+				if (rc != UNQLITE_OK) { return; }
+			}
+			else {
+				int rc = unqlite_open(&m_db, file_name.c_str(), UNQLITE_OPEN_READWRITE);
+				if (rc != UNQLITE_OK) { return; }
+			}
 		}
 
 		~UnqliteDB() {
@@ -33,32 +40,35 @@ namespace signalpp {
 		}
 
 		void put(const std::string& key, const std::string& value) {
-			int rc = unqlite_kv_store(m_db, key.c_str(), sizeof(key), value.c_str(), value.length());
+			int rc = unqlite_kv_store(m_db, key.c_str(), -1, value.c_str(), value.length());
 			if (rc != UNQLITE_OK) {
-				//Insertion fail, Hande error (See below)
+				if (rc == UNQLITE_EXISTS) {
+					printf_s("Record exists \n");
+				}
 				return;
 			}
 		}
 
 		void put(const std::string& key, int intValue) {
-			int rc = unqlite_kv_store(m_db, key.c_str(), sizeof(key), &intValue, sizeof(intValue));
-			printf_s("hold");
+			int rc = unqlite_kv_store(m_db, key.c_str(), -1, &intValue, sizeof(intValue));
 			if (rc != UNQLITE_OK) {
-				//Insertion fail, Hande error (See below)
+				if (rc == UNQLITE_EXISTS) {
+					printf_s("Record exists \n");
+				}
 				return;
 			}
 		}
 
 		bool get(const std::string& key, std::string& value) {
-			unqlite_int64 nBytes; // -1 gives different behavior
+			unqlite_int64 nBytes;
 			int rc = -1;
-			rc = unqlite_kv_fetch(m_db, key.c_str(), sizeof(key), NULL, &nBytes);
+			rc = unqlite_kv_fetch(m_db, key.c_str(), -1, NULL, &nBytes);
 			if (rc == UNQLITE_NOTFOUND) { // -6
 				printf_s("key does not exist");
 				return false;
 			}
 			void* buffer = malloc(nBytes);
-			rc = unqlite_kv_fetch(m_db, key.c_str(), sizeof(key), buffer, &nBytes);
+			rc = unqlite_kv_fetch(m_db, key.c_str(), -1, buffer, &nBytes);
 			std::string ret((char const*)buffer, nBytes);
 			value = ret;
 			if (rc != UNQLITE_OK) {
@@ -70,13 +80,13 @@ namespace signalpp {
 		bool get(const std::string& key, int& intValue) {
 			unqlite_int64 nBytes;
 			int rc = -1;
-			rc = unqlite_kv_fetch(m_db, key.c_str(), sizeof(key), NULL, &nBytes); // passing -1 as keylength in this case gives key not found behavior
+			rc = unqlite_kv_fetch(m_db, key.c_str(), -1, NULL, &nBytes);
 			if (rc == UNQLITE_NOTFOUND) { // -6
 				printf_s("key does not exist");
 				return false;
 			}
 			void* buffer = malloc(nBytes);
-			rc = unqlite_kv_fetch(m_db, key.c_str(), sizeof(key), buffer, &nBytes);
+			rc = unqlite_kv_fetch(m_db, key.c_str(), -1, buffer, &nBytes);
 			intValue = *(const int*)buffer;
 			if (rc != UNQLITE_OK) {
 				return false;

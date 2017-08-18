@@ -57,9 +57,8 @@ void for_each(signalpp::Storage<signalpp::NuDB>& storage)
 	//storage.open(dp, kp, lp, ec);
 }
 
-
+signalpp::Storage<signalpp::UnqliteDB> storage("testdb");
 TEST_CASE("UnqliteDB tests") {
-	signalpp::Storage<signalpp::UnqliteDB> storage("testdb");
 	SECTION("Database Insert And Retrieve Integer") {
 		int expected = 42;
 		int value = put_and_verify<signalpp::UnqliteDB, int>(storage, "divider", expected);
@@ -68,8 +67,6 @@ TEST_CASE("UnqliteDB tests") {
 	SECTION("identityKey") {
 		std::string expected = "\x5Z≠ÒEa‚:{T?É^Ó \a‘\\ı§T\bcçrÁ»ëÃâ\x6\x6V$&&$‡\tﬁ6é∫Ê;5\t,¬\x13ç\x16´a‘\xfe¥◊\"ô+…†\f¢#j";
 		std::string value = put_and_verify<signalpp::UnqliteDB,std::string>(storage, "identityKey", expected);
-		//printf_s(value.c_str());
-		//printf_s(expected.c_str());
 		REQUIRE(strcmp(value.c_str(), expected.c_str()) == 0);
 	}
 	SECTION("signalingKey") {
@@ -107,7 +104,7 @@ TEST_CASE("UnqliteDB tests") {
 		std::string value = put_and_verify<signalpp::UnqliteDB, std::string>(storage, "deviceId", expected);
 		REQUIRE(strcmp(value.c_str(), expected.c_str()) == 0);
 	}
-	storage.close();
+	storage.commit();
 }
 
 TEST_CASE("NuDB Database Insert And Retrieve") {
