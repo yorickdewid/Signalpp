@@ -1,3 +1,8 @@
+- Session store, store in Unqslite db / Query for keys only when necessary
+- Fix session store, problem with constant updating of identity key and bad mac.
+- Callback for result of server, to check needsSync field
+- Sync with first device
+
 - Move to CMAKE
 - Rewrite libwebsockets with boost::asio
 - Boost logging

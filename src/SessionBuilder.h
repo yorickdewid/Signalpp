@@ -14,6 +14,9 @@
 namespace signalpp {
 
 class SessionBuilder {
+
+	/* needs to be stored..*/
+
 	signal_context *context = nullptr;
 	signal_protocol_store_context *store_context = nullptr;
 	session_builder *m_session_builder = nullptr;
@@ -40,6 +43,7 @@ public:
 		signal_context_destroy(context);
 	}
 
+	/* supply from storage */
 	void processPreKey(nlohmann::json device) {
 		session_pre_key_bundle *pre_key = nullptr;
 
@@ -72,6 +76,7 @@ public:
 		std::string identityKey = device["identityKey"].get<std::string>();
 		ec_public_key *identity_public_key = nullptr;
 
+		/* this is THEIR identity key */
 		result = curve_decode_point(&identity_public_key, (const uint8_t *)identityKey.data(), identityKey.size(), context);
 		if (result) {
 			//SIGNAL_LOG_ERROR << "Cannot decode public key";

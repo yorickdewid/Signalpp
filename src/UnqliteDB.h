@@ -59,6 +59,10 @@ namespace signalpp {
 			}
 		}
 
+		void put(const std::string& key, nlohmann::json& value) {
+			put(key, value.dump()); // throw or smt..
+		}
+
 		bool get(const std::string& key, std::string& value) {
 			unqlite_int64 nBytes;
 			int rc = -1;
@@ -92,6 +96,15 @@ namespace signalpp {
 				return false;
 			}
 			return true;
+		}
+
+		bool get(const std::string& key, nlohmann::json& value) {
+			std::string serialized_json;
+			bool result = get(key, serialized_json);
+			if (serialized_json.length() > 0) {
+				value = nlohmann::json::parse(serialized_json);
+			}
+			return result;
 		}
 
 		void commit() {

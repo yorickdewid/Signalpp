@@ -15,7 +15,7 @@ namespace signalpp {
 
 class OutgoingMessage {
 	std::shared_ptr<TextSecureServer> m_server;
-	// SignalProtocolStore protocol;
+	std::shared_ptr<StorageContainer> m_storage;
 	std::vector<std::string> successfulNumbers;
 	std::map<int, SessionBuilder *> sessions;
 	std::string m_message;
@@ -26,7 +26,7 @@ class OutgoingMessage {
 	void handleKeyResults(nlohmann::json response, std::string number, std::vector<int> updateDevices) {
 		for (auto& device : response["devices"]) {
 			device["identityKey"] = response["identityKey"];
-				
+			
 			_deviceIds.push_back(device["deviceId"].get<int>());
 
 			ProtocolAddress *address = new ProtocolAddress(number, device["deviceId"].get<int>());
@@ -37,7 +37,7 @@ class OutgoingMessage {
 			// SIGNAL_LOG_INFO << "ProtocolAddress 1 " << (void *)&address;
 
 			sessions[address->getDeviceId()] = new SessionBuilder(address);
-			sessions[address->getDeviceId()]->processPreKey(device);
+			sessions[address->getDeviceId()]->processPreKey(device); // this reloads identitykey etc
 
 			// builder->processPreKey(device);
 			//TODO: handle errors
@@ -54,11 +54,13 @@ class OutgoingMessage {
 
 public:
 	OutgoingMessage(std::shared_ptr<TextSecureServer> server,
+					std::shared_ptr<StorageContainer> storage,
 					long int timestamp,
 					std::vector<std::string>& numbers,
 					std::string& message,
 					std::function<void()> callback)
 		: m_server(server)
+		, m_storage(storage)
 		, m_message(message)
 		, m_timestamp(timestamp) {
 		
@@ -136,6 +138,7 @@ public:
 		printf("\n");
 
 		for (int& deviceId : deviceIds) {
+			/* In sessions we need to retrieve stored prekeybundle */
 		 	auto ciphertext = sessions.at(deviceId)->encryptToDevice(std::string(paddedPlaintext, 159));
 			SIGNAL_LOG_INFO << "Ciphertext length " << std::get<0>(ciphertext).length();
 			
@@ -185,22 +188,26 @@ public:
 
 	void getKeysForNumber(std::string& number, std::vector<int> updateDevices) {
 		if (updateDevices.empty()) {
-			auto result = m_server->getKeysForNumber(number);
+			nlohmann::json result;
+			if (!m_storage->get(number, result)) {
+				result = m_server->getKeysForNumber(number);
+				m_storage->put(number, result);
+			}
 			if (result == nullptr)
 				return;
 			handleKeyResults(result, number, updateDevices);
 		} else {
 			for (int device : updateDevices) {
-				auto result = m_server->getKeysForNumber(number, device);
+				nlohmann::json result;
+				std::string device_number = number + "_" + std::to_string(device);
+				if (!m_storage->get(device_number, result)) {
+					result = m_server->getKeysForNumber(number, device);
+					m_storage->put(device_number, result);
+				}
 				if (result == nullptr)
 					continue;
 				handleKeyResults(result, number, updateDevices);
-				//TODO: handle errors
-				// if (e.name === 'HTTPError' && e.code === 404 && device !== 1) {
-				// 	return this.removeDeviceIdsForNumber(number, [device]);
-				// } else {
-				// 	throw e;
-				// }
+
 			}
 
 			return;
@@ -225,11 +232,18 @@ public:
 		return updateDevices;
 	}
 
+	/* this function keeps exchanging the identityKey, which is incorrect */
 	void sendToNumber(std::string& number) {
 		SIGNAL_LOG_INFO << "Send to number " << number;
 
 		auto updateDevices = getStaleDeviceIdsForNumber(number);
-		getKeysForNumber(number, updateDevices);
+		/* store the bloody keys
+		   Do we want to serialize a vector or perhaps an std::map?
+		
+		*/
+		//if (!m_storage->get("preKey")) {
+			getKeysForNumber(number, updateDevices);
+		//}
 		reloadDevicesAndSend(number, true);
 		//TODO: handle errors
 	}

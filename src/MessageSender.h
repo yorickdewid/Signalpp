@@ -25,25 +25,63 @@ public:
 						const std::string& attachment_server_url)
 	: m_server(new TextSecureServer(url, username, password, ports, attachment_server_url))
 	, m_storage(storage) {
-		// this.url = url;
-		// this.signalingKey = signalingKey;
-		// this.username = username;
-		// this.password = password;
-
-		// var address = libsignal.SignalProtocolAddress.fromString(username);
-		// this.number = address.getName();
-		// this.deviceId = address.getDeviceId();
 	}
 
 	void sendMessageProto(long int timestamp, std::vector<std::string>& numbers, textsecure::Content& message, std::function<void()> callback) {
 		std::string data;
 		message.SerializeToString(&data);
 
-		auto outgoing = new OutgoingMessage(m_server, timestamp, numbers, data, callback);
+		auto outgoing = new OutgoingMessage(m_server, m_storage, timestamp, numbers, data, callback);
 
 		for (std::string& number : numbers) {
 			outgoing->sendToNumber(number);
 		}
+	}
+
+	long get_time_stamp() {
+		std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
+		return ms.count();
+	}
+
+	void sendMessage(std::string& myNumber,int& deviceId, std::string* body, std::string to) {
+		long timestamp = get_time_stamp();
+		//structure -> Content container -> DataMessage -> Body
+		textsecure::Content& proto = textsecure::Content();
+		textsecure::DataMessage* message = new textsecure::DataMessage(); // gets deleted twice hmm..
+		message->set_allocated_body(body);
+		proto.set_allocated_datamessage(message);
+
+		std::string* body2 = new std::string(*body);
+		// we recreate it here because the Content protobuf class cleans up automagically..
+		message = new textsecure::DataMessage(); // gets deleted twice hmm..
+		message->set_allocated_body(body2);
+		//messageSender.sendMessageProto(timestamp, numbers, proto, [] {});
+		// this only sends to reciptient, but fails to sync with first device.
+		sendIndividualProto(to, proto, timestamp); // we should get back the message from server and determine if syncing is neccessary..
+		/* We need a sync message to sync with the first device */
+
+		sendSyncMessage(myNumber,deviceId,message,timestamp);
+	}
+
+	void sendSyncMessage(std::string& myNumber, int& deviceId, textsecure::DataMessage* message, long int timestamp) {
+		/* Primary device */
+		if (deviceId == 1) {
+			return;
+		}
+		textsecure::SyncMessage_Sent* sentSyncMessage = new textsecure::SyncMessage_Sent();
+		sentSyncMessage->set_timestamp(timestamp);
+		sentSyncMessage->set_allocated_message(message);
+		sentSyncMessage->set_destination(myNumber);
+
+		textsecure::SyncMessage* syncMessage = new textsecure::SyncMessage();
+		syncMessage->set_allocated_sent(sentSyncMessage);
+
+		textsecure::Content contentMessage = textsecure::Content();
+		contentMessage.set_allocated_syncmessage(syncMessage);
+
+		sendIndividualProto(myNumber, contentMessage, timestamp);
+		//delete syncMessage;
+		//delete sentSyncMessage;
 	}
 
 	void sendIndividualProto(std::string& number, textsecure::Content& proto, long int timestamp) {

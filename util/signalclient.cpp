@@ -2,6 +2,7 @@
 #include <sstream>
 #include <string>
 #include <boost/program_options.hpp>
+#include <chrono>
 
 #include <signalpp/signalpp.h>
 
@@ -69,6 +70,35 @@ void init(bool firstRun = false) {
 		syncRequest.onContactSyncComplete();
 	});
 	// }
+	//interactive_client();
+}
+
+void interactive_client() {
+	std::string username, self_number, password, signalingKey;
+	storage->get("number", self_number);
+	storage->get("number_id", username);
+	storage->get("password", password);
+	storage->get("signaling_key", signalingKey);
+	int deviceId = -1;
+	storage->get("device_id", deviceId);
+	signalpp::MessageSender messageSender(storage,
+		signalpp::serverUrl,
+		signalpp::serverPorts,
+		username, password, signalingKey,
+		signalpp::attachmentServerUrl);
+	bool interactive = true;
+	while (interactive) {
+		std::cout << "Enter string:";
+		std::string* body = nullptr;
+		std::string s;
+		std::getline(std::cin, s);
+		if (s.compare("/exit()") == 0) {
+			interactive = false;
+		}
+		body = new std::string(s);
+		messageSender.sendMessage(self_number, deviceId, body,std::string(""));
+		std::cout << "Sending message: " << s << std::endl;
+	}
 }
 
 void register_client() {
@@ -148,12 +178,11 @@ int main(int argc, char *argv[]) {
 		Uncommited values also was not.
 	*/
 	storage->commit();
-	storage->get("identityKey", IdentityKey);
 
 	/* Initialize the client */
 	init(firstRun);
 
-	getchar();
+	interactive_client();
 
 	return 0;
 }

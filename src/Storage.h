@@ -4,6 +4,8 @@
 #include <memory>
 #include <iostream>
 
+#include "Json.h"
+
 namespace signalpp {
 
 class StorageContainer {
@@ -12,8 +14,10 @@ class StorageContainer {
     /* Interfaces */
     virtual void put(const std::string& key, const std::string& value) = 0;
     virtual void put(const std::string& key, int value) = 0;
+	virtual void put(const std::string& key, nlohmann::json& value) = 0;
     virtual bool get(const std::string& key, std::string& value) = 0;
     virtual bool get(const std::string& key, int& value) = 0;
+	virtual bool get(const std::string& key, nlohmann::json& value) = 0;
     virtual void purge(const std::string& key) = 0;
 	virtual void commit() = 0;
     virtual void close() = 0;
@@ -38,11 +42,19 @@ class Storage : public StorageContainer {
 		m_db->put(key, value);
 	}
 
+	inline void put(const std::string& key, nlohmann::json& value) {
+		m_db->put(key, value);
+	}
+
 	inline bool get(const std::string& key, std::string& value) {
 		return m_db->get(key, value);
 	}
 
 	inline bool get(const std::string& key, int& value) {
+		return m_db->get(key, value);
+	}
+
+	inline bool get(const std::string& key, nlohmann::json& value) {
 		return m_db->get(key, value);
 	}
 
