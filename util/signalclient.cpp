@@ -5,6 +5,7 @@
 #include <chrono>
 
 #include <signalpp/signalpp.h>
+#include "Json.h"
 
 #define CLIENT_NAME		"SignalClient++"
 
@@ -69,11 +70,28 @@ void init(bool firstRun = false) {
 		std::cout << "Sync timed out" << std::endl;
 		syncRequest.onContactSyncComplete();
 	});
-	// }
-	//interactive_client();
 }
 
+std::string getPhoneNumberFromConfig() {
+	std::ifstream myfile;
+	/* see config.template for creating config.json*/
+	myfile.open("..\\config.json", std::ios::in);
+	std::string line;
+	std::ostringstream json_serialized;
+	if (myfile.is_open()) {
+		while (std::getline(myfile, line))
+		{
+			json_serialized << line;
+		}
+		myfile.close();
+	}
+	nlohmann::json json = nlohmann::json::parse(json_serialized.str());
+	return json.at("sendToPhoneNumber");
+}
+
+
 void interactive_client() {
+	std::string toPhoneNumber = getPhoneNumberFromConfig();
 	std::string username, self_number, password, signalingKey;
 	storage->get("number", self_number);
 	storage->get("number_id", username);
@@ -96,7 +114,7 @@ void interactive_client() {
 			interactive = false;
 		}
 		body = new std::string(s);
-		messageSender.sendMessage(self_number, deviceId, body,std::string(""));
+		messageSender.sendMessage(self_number, deviceId, body, toPhoneNumber);
 		std::cout << "Sending message: " << s << std::endl;
 	}
 }
@@ -125,7 +143,6 @@ void register_client() {
 
 	firstRun = true;
 }
-
 
 int main(int argc, char *argv[]) {
 	namespace cli = boost::program_options;

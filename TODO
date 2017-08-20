@@ -1,5 +1,6 @@
 - Session store, store in Unqslite db / Query for keys only when necessary
 - Fix session store, problem with constant updating of identity key and bad mac.
+- Make sure database closes properly, so we don't have to call ->commit all over the place.
 - Callback for result of server, to check needsSync field
 - Sync with first device
 

@@ -88,7 +88,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\unqlite;..\packages\boost.1.64.0.0\lib\native\include;..\NuDb\include;..\include;..\libwebsockets\build\include;..\packages\openssl.v140.windesktop.msvcstl.static.rt-dyn.x64.1.0.2.1\build\native\include;..\libsignal-protocol-c\src;..\packages\protobuf.2.6.1.1\build\native\include;..\packages\leveldb-vc140.1.16.0.5\build\native\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\src;..\unqlite;..\packages\boost.1.64.0.0\lib\native\include;..\NuDb\include;..\include;..\libwebsockets\build\include;..\packages\openssl.v140.windesktop.msvcstl.static.rt-dyn.x64.1.0.2.1\build\native\include;..\libsignal-protocol-c\src;..\packages\protobuf.2.6.1.1\build\native\include;..\packages\leveldb-vc140.1.16.0.5\build\native\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

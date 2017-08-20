@@ -46,3 +46,4 @@ Debug
 *.pdb
 vars.txt
 *.udb
+config.json
